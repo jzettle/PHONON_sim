@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<gdml xmlns:gdml="http://cern.ch/2001/Schemas/GDML" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+      xsi:noNamespaceSchemaLocation="../schema/gdml.xsd" >
+
+  <define>
+    <!-- Constants --> 
+    <constant name="TWOPI" value="2.0*pi" />
+    <constant name="pmtrad" value="4.0*2.54" />
+    <constant name="PI" value="1.0*pi" />
+    <constant name="HALFPI" value="0.5*pi" />
+    <!-- Quantities -->
+    <quantity name="world_x" value="5000.0" unit="mm" />
+    <quantity name="world_y" unit="mm" value="5000.0" />
+    <quantity name="world_z" unit="mm" value="5000.0" />
+    <!-- Positions -->
+    <position name="scintPos" unit="m" x="0.0" y="0.0" z="0.0" /> 
+    <position name="airPos" unit="m" x="0.15" y="0.0" z="0.0" />
+    <position name="waterShieldPos" unit="m" x="0.0" y="0.0" z="0.0" />
+    <position name="shieldPos" unit="m" x="0.0" y="0.0" z="0.0" />
+    <!--<position name="targetPos" unit="m" x="0.75" y="0.0" z="0.0" /> 
+    <position name="shieldPos" unit="m" x="1.25" y="0.0" z="0.0" /> 
+    <position name="steelPos" unit="m" x="1.75" y="0.0" z="0.0" /> -->
+    <position name="scintSub" unit="m" x="-0.15" y="0.0" z="0.0" />
+    <position name="waterShieldSub" unit="m" x="0.15" y="0.0" z="0.0" />
+    <!--<position name="cuSub" unit="m" x="-0.50" y="0.0" z="0.0" />
+    <position name="steelSub" unit="m" x="-0.50" y="0.0" z="0.0" /> -->
+    <position name="shieldSub" unit="m" x="0.0" y="0.0" z="0.0" />
+    <!-- old x pos -1.8 -1.55 -1.05 -0.55, shift by 2.05 m so edge is at 0-->
+    <!-- <position name="targetPos" unit="m" x="-3.5975" y="0.0" z="0.0" /> -->
+  </define>
+
+  <materials>
+    <element name="Hydrogen" formula="H" Z="1."> <atom value="1.01"/>
+    </element>
+    <element name="Oxygen" formula="O" Z="8."> <atom value="16.0"/>
+    </element>
+    <element name="Nitrogen" formula="N" Z="7."> <atom value="14.01"/>
+    </element>
+    <element name="Carbon" formula="C" Z="6."> <atom value="12.01"/>
+    </element>
+    <element name="Fluorine" formula="F" Z="9"> <atom value="18.00"/>
+    </element>
+    <element name="Argon" formula="Ar" Z="18."> <atom value="39.95"/>
+    </element>
+    <element name="Copper" formula="Cu" Z="29"> <atom value="63.546"/>
+    </element>
+    <element name="Lead" formula="Pb" Z="82"> <atom value="207.2"/>
+    </element>
+    <material name="Air">
+      <D value="1.290" unit="mg/cm3"/>
+      <fraction n="0.7" ref="Nitrogen"/>
+      <fraction n="0.3" ref="Oxygen"/>
+    </material>
+    <material name="Graphite">
+      <D value="1.78" unit="g/cm3"/>
+      <composite n="1" ref="Carbon"/>
+    </material>
+    <material name="liquidArgon" formula="LAr">
+      <D value="1.4" unit="g/cm3"/>
+      <composite n="1" ref="Argon"/>
+    </material>
+    <material name="PTFE">
+      <D value="2.2" unit="g/cm3"/>
+      <composite n="2" ref="Carbon"/>
+      <composite n="4" ref="Fluorine"/>
+    </material>
+    <material name="Copper">
+      <D value="8.96" unit="g/cm3"/>
+      <composite n="1" ref="Copper"/>
+    </material>
+    <material name="Lead">
+      <D value="11.34" unit="g/cm3"/>
+      <composite n="1" ref="Lead"/>
+    </material>
+
+    <material name="Scintillator">
+      <D value="0.874" unit="g/cm3"/>
+      <composite n="250" ref="Carbon"/>
+      <composite n="303" ref="Hydrogen"/>
+    </material>
+    <material name="Water">
+      <D value="1.0" unit="g/cm3"/>
+      <composite n="2" ref="Hydrogen"/>
+      <composite n="1" ref="Oxygen"/>
+    </material>
+  </materials>  
+  
+  <solids>
+    <box name="WorldSolid" lunit="mm" x="5000.0" y="5000.0" z="5000.0" />
+    <!-- z is the "beam direction here"-->
+    <box name="ScintillatorSolid" lunit="mm" x="100.0" y="100.0" z="100.0" />
+    <box name="AirSolid" lunit="mm" x="700.0" y="400.0" z="400.0" />
+    <!--<box name="TargetSolid" lunit="mm" x="1500.0" y="200.0" z="200.0" /> -->
+    <box name="WaterShieldSolid" lunit="mm" x="800.0" y="800.0" z="800.0" />
+    <box name="LeadShieldSolid" lunit="mm" x="1000.0" y="1000.0" z="1000.0" />
+
+    <subtraction name="DetectorCavity">
+      <first ref="AirSolid"/>
+      <second ref="ScintillatorSolid"/>
+      <positionref ref="scintSub" />
+    </subtraction>
+
+    <subtraction name="WaterShieldCavity">
+      <first ref="WaterShieldSolid"/>
+      <second ref="AirSolid"/>
+      <positionref ref="waterShieldSub" />
+    </subtraction>
+
+    <subtraction name="FullShieldCavity">
+      <first ref="LeadShieldSolid" />
+      <second ref="WaterShieldSolid" />
+      <positionref ref="shieldSub" />
+    </subtraction>
+
+   <!-- <subtraction name="FullShieldedSolid" >
+      <first ref="ShieldSolid" />
+      <second ref="CopperShieldSolid" />
+      <positionref ref="steelSub" />
+    </subtraction> -->
+
+  </solids>
+  <structure>
+   
+    <volume name="ScintLog">
+      <materialref ref="Scintillator" />
+      <solidref ref="ScintillatorSolid" />
+    </volume>
+
+    <volume name="AirLog">
+      <materialref ref="Air" />
+      <solidref ref="DetectorCavity" />
+    </volume> 
+ 
+    <volume name="WaterShieldLog">
+      <materialref ref="Water" />
+      <solidref ref="WaterShieldCavity" />
+    </volume>
+    
+    <volume name="FullShieldLog">
+      <materialref ref="Lead" />
+      <solidref ref="FullShieldCavity" />
+    </volume> 
+
+    <volume name="World" >
+      <materialref ref="Air" />
+      <solidref ref="WorldSolid" />
+      
+    <physvol name="ScintillatorVol" >
+  <volumeref ref="ScintLog" />
+	<positionref ref="scintPos" />
+      </physvol>
+
+      <physvol name="AirVol" >
+  <volumeref ref="AirLog" />
+  <positionref ref="airPos" />
+    </physvol> 
+
+      <physvol name="WaterShieldVol" >
+	<volumeref ref="WaterShieldLog" />
+	<positionref ref="waterShieldPos" />
+      </physvol>
+      
+      <physvol name="FullShieldVol" >
+	<volumeref ref="FullShieldLog" />
+	<positionref ref="shieldPos" />
+      </physvol>
+     
+    </volume>
+  </structure>
+
+  <setup name="Target" version="1.0">
+    <world ref="World"/>
+  </setup>
+</gdml>
+   
+		          

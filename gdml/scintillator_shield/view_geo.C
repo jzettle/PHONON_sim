@@ -1,0 +1,27 @@
+void view_geo()
+{
+  TGeoManager::Import("ScintillatorShield.gdml");
+
+  //gGeoManager->PrintGeometry();
+
+    // Check for overlaps
+  std::cout << "\n--- Checking geometry consistency ---" << std::endl;
+  gGeoManager->CheckGeometry();
+
+  std::cout << "\n--- Checking for overlaps ---" << std::endl;
+  gGeoManager->CheckOverlaps(0.1); // Tolerance of 0.1 units
+  gGeoManager->PrintOverlaps();
+  
+  // Optionally browse the geometry
+  //new TBrowser();
+  TGeoVolume* topVolume = gGeoManager->GetTopVolume();
+  TGeoVolume* target = gGeoManager->FindVolumeFast("AirLog");
+    if (target) {
+        target->SetLineColor(kRed);
+    } else {
+        std::cout << "Volume not found." << std::endl;
+    }
+  // Draw the top volume in the OpenGL viewer
+  //topVolume->Draw("ogl");
+  gGeoManager->GetTopNode()->Draw("ogl");
+}
