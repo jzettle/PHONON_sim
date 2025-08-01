@@ -55,7 +55,7 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
 
   G4cout << "Opening Analysis Manager for run." << G4endl;
   G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
-  analysisManager->OpenFile("test.root");
+  analysisManager->OpenFile("no_shield_10kneutrons.root");
   //G4cout << "Analysis Manager created." << G4endl;
   //analysisManager->SetVerboseLevel(1);
   //analysisManager->SetNtupleMerging(true);  // Required for parallel run (multithreading)
@@ -77,6 +77,8 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("EventID");
   analysisManager->CreateNtupleDColumn("TrackID");
   analysisManager->CreateNtupleDColumn("PDGCode");
+  analysisManager->CreateNtupleSColumn("ParticleName");
+  analysisManager->CreateNtupleSColumn("ParticleDefinition");
   analysisManager->CreateNtupleDColumn("Edep");
   analysisManager->CreateNtupleDColumn("PositionX");
   analysisManager->CreateNtupleDColumn("PositionY");

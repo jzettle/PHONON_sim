@@ -72,6 +72,7 @@ class PHONONDetectorConstruction : public G4VUserDetectorConstruction
 
     G4Material*        fPbShieldMaterial;  // pointer to the lead shield material
     G4Material*        fWaterShieldMaterial; // pointer to the water shield material
+    G4Material*        fVacuumMaterial; // pointer to the vacuum material
     G4Material*        fChamberMaterial; // pointer to the chamber material
 
     G4UserLimits*      fStepLimit;       // pointer to user step limits

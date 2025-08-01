@@ -36,6 +36,8 @@
 #include "G4NistManager.hh"
 #include "G4SDManager.hh"
 
+#include "G4SubtractionSolid.hh"
+
 #include "G4Box.hh"
 #include "G4Tubs.hh"
 #include "G4LogicalVolume.hh"
@@ -98,20 +100,30 @@ void PHONONDetectorConstruction::DefineMaterials()
 
   // Air defined using NIST Manager
   nistManager->FindOrBuildMaterial("G4_AIR");
+
+  fVacuumMaterial = nistManager->FindOrBuildMaterial("G4_Galactic");
   
   // Lead defined using NIST Manager
   fPbShieldMaterial = nistManager->FindOrBuildMaterial("G4_Pb");
 
   fWaterShieldMaterial = nistManager->FindOrBuildMaterial("G4_WATER");
 
-  // Xenon gas defined using NIST Manager
 
   G4Element* elH = new G4Element("Hydrogen","H",1.,1.01*g/mole);
   G4Element* elC = new G4Element("Carbon","C",6.,12.01*g/mole);
   //double density = 0.874*g/cm3;
-  fChamberMaterial = new G4Material("EJ301",0.874*g/cm3,2);
-  fChamberMaterial->AddElement(elH, 303);
-  fChamberMaterial->AddElement(elC, 250);
+  //fChamberMaterial = new G4Material("EJ301",0.874*g/cm3,2);
+  //fChamberMaterial->AddElement(elH, 303);
+  //fChamberMaterial->AddElement(elC, 250);
+  G4Element* elLi  = new G4Element("Li","Li", 3., 6.941*g/mole);
+  G4Element* elO   = new G4Element("O","O" , 8., 16.*g/mole);
+  G4Element* elNb  = new G4Element("Nb","Nb", 41., 92.9064*g/mole);
+  G4Material* LN = new G4Material("LN", 4.65*g/cm3, 3);
+  LN->AddElement(elLi, 1);
+  LN->AddElement(elNb, 1);
+  LN->AddElement(elO, 3);
+
+  fChamberMaterial = LN; // Use LN as the chamber material
   //fChamberMaterial = nistManager->FindOrBuildMaterial("G4_Xe");
 
   // Print materials
@@ -135,7 +147,7 @@ G4VPhysicalVolume* PHONONDetectorConstruction::DefineVolumes()
   //G4double trackerLength = (NbOfChambers+1)*chamberSpacing;
 
   //G4double worldLength = 1.2 * (2*targetLength + trackerLength);
-  G4double worldLength = 10*m; // World size
+  G4double worldLength = 5*m; // World size
 
   //G4double targetRadius  = 0.5*targetLength;   // Radius of Target
   //targetLength = 0.5*targetLength;             // Half length of the Target  
@@ -186,6 +198,7 @@ G4VPhysicalVolume* PHONONDetectorConstruction::DefineVolumes()
      = new G4Box("PbShield", totalThickness/2, totalThickness/2, totalThickness/2);
   G4LogicalVolume* PbShieldLV
       = new G4LogicalVolume(PbShieldS, fPbShieldMaterial, "PbShield", 0, 0, 0);
+  
   G4VPhysicalVolume* PbShieldPV
      = new G4PVPlacement(0,              // no rotation
                     G4ThreeVector(0, 0, PbShieldThickness/2), // at (x,y,z)
@@ -194,12 +207,13 @@ G4VPhysicalVolume* PHONONDetectorConstruction::DefineVolumes()
                     worldLV,       // its mother volume
                     false,         // no boolean operations
                     0,             // copy number
-                    fCheckOverlaps); // checking overlaps    
+                    fCheckOverlaps); // checking overlaps */  
   
   G4Box* WaterShieldS
      = new G4Box("WaterShield", (totalThickness-WaterShieldThickness)/2, (totalThickness-WaterShieldThickness)/2, (totalThickness-WaterShieldThickness)/2);
   G4LogicalVolume* WaterShieldLV
       = new G4LogicalVolume(WaterShieldS, fWaterShieldMaterial, "WaterShield", 0, 0, 0);
+  
   G4VPhysicalVolume* WaterShieldPV
      = new G4PVPlacement(0,              // no rotation
                     G4ThreeVector(0, 0, 0), // at (x,y,z)
@@ -208,19 +222,89 @@ G4VPhysicalVolume* PHONONDetectorConstruction::DefineVolumes()
                     PbShieldLV,       // its mother volume
                     false,         // no boolean operations
                     0,             // copy number
-                    fCheckOverlaps); // checking overlaps 
+                    fCheckOverlaps); // checking overlaps */
+
+  // make chamber out of vacuum instead of air, more likely how the dil fridge will work
+  G4Box* AirS
+    = new G4Box("AirChamber", 0.5*ScintThickness, 0.5*ScintThickness, 0.5*ScintThickness);
+  G4LogicalVolume *AirChamberLV 
+    = new G4LogicalVolume(AirS, fVacuumMaterial, "AirChamber", 0, 0, 0);
+  G4VPhysicalVolume* AirChamberPV
+    = new G4PVPlacement(0,              // no rotation
+                    G4ThreeVector(0, 0, 0), // at (x,y,z)
+                    AirChamberLV, // its logical volume      
+                    "AirChamber",     // its name
+                    WaterShieldLV, // its mother volume
+                    //worldLV,
+                    false,         // no boolean operations
+                    0,             // copy number
+                    fCheckOverlaps); // checking overlaps*/
 
   //Scintillator Chamber
   G4Box* chamberS
-    = new G4Box("ScintChamber", 0.5*ScintThickness, 0.5*ScintThickness, 0.5*ScintThickness);
+    = new G4Box("ScintChamber", 20*mm, 20*mm, 20*mm);
+
+  //subtract the scintillator from the air chamber
+  /*
+  G4SubtractionSolid* chamberS2
+    = new G4SubtractionSolid("ScintChamberSub", chamberS, AirS, 0, G4ThreeVector(-0.15*m, 0, 0));
+
+  //subtract the air chamber from the water shield
+  G4SubtractionSolid* chamberS3
+    = new G4SubtractionSolid("ScintChamberSub2", AirS, WaterShieldS, 0, G4ThreeVector(0.15*m, 0, 0));
+
+  //subtract the water shield from the lead shield
+  G4SubtractionSolid* chamberS4
+    = new G4SubtractionSolid("ScintChamberSub3", PbShieldS, WaterShieldS, 0, G4ThreeVector(0, 0, 0));
+      */
   fLogicChamber 
     = new G4LogicalVolume(chamberS, fChamberMaterial, "Chamber", 0, 0, 0);
-  G4VPhysicalVolume* chamberPV
+  /*
+  //create logical volumes for the subtraction solids
+  G4LogicalVolume* chamberS2LV
+    = new G4LogicalVolume(chamberS2, air, "ScintChamberSub", 0, 0, 0);  
+
+  G4LogicalVolume* chamberS3LV
+    = new G4LogicalVolume(chamberS3, fWaterShieldMaterial, "ScintChamberSub2", 0, 0, 0);
+  G4LogicalVolume* chamberS4LV
+    = new G4LogicalVolume(chamberS4, fPbShieldMaterial, "ScintChamberSub3", 0, 0, 0);
+  // Place the logical volumes in the world volume
+  G4VPhysicalVolume* chamberS2PV
+    = new G4PVPlacement(0,              // no rotation
+                    G4ThreeVector(0.15*m, 0, 0), // at (x,y,z)
+                    chamberS2LV, // its logical volume      
+                    "ScintChamberSub",     // its name
+                    worldLV, // its mother volume
+                    false,         // no boolean operations
+                    0,             // copy number
+                    fCheckOverlaps); // checking overlaps
+  G4VPhysicalVolume* chamberS3PV
     = new G4PVPlacement(0,              // no rotation
                     G4ThreeVector(0, 0, 0), // at (x,y,z)
+                    chamberS3LV, // its logical volume      
+                    "ScintChamberSub2",     // its name
+                    worldLV, // its mother volume
+                    false,         // no boolean operations
+                    0,             // copy number
+                    fCheckOverlaps); // checking overlaps
+  G4VPhysicalVolume* chamberS4PV
+    = new G4PVPlacement(0,              // no rotation
+                    G4ThreeVector(0, 0, 0), // at (x,y,z)
+                    chamberS4LV, // its logical volume      
+                    "ScintChamberSub3",     // its name
+                    worldLV, // its mother volume
+                    false,         // no boolean operations
+                    0,             // copy number
+                    fCheckOverlaps); // checking overlaps
+  
+  */
+
+  G4VPhysicalVolume* chamberPV
+    = new G4PVPlacement(0,              // no rotation
+                    G4ThreeVector(-0.15, 0, 0), // at (x,y,z)
                     fLogicChamber, // its logical volume      
                     "Chamber",     // its name
-                    WaterShieldLV, // its mother volume
+                    AirChamberLV, // its mother volume
                     false,         // no boolean operations
                     0,             // copy number
                     fCheckOverlaps); // checking overlaps

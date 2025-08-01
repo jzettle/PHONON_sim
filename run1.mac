@@ -41,8 +41,13 @@
 # 3 event with detailed printing
 #
 /gps/particle neutron
-/gps/energy 300 MeV
-/gps/pos/centre -1.1 0. 0. m
+#/gps/energy 300 MeV
+/gps/ene/type Lin
+/gps/ene/min 0.0 MeV
+/gps/ene/max 300 MeV
+/gps/ene/gradient 0.0
+/gps/ene/intercept 0.001
+/gps/pos/centre -1.01 0. 0. m
 /gps/direction 1. 0. 0.
 
-/run/beamOn 100
+/run/beamOn 10000

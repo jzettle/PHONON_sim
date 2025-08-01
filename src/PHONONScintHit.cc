@@ -45,6 +45,8 @@ PHONONScintHit::PHONONScintHit()
    fTrackID(-1),
    //fChamberNb(-1),
    fPDGCode(-1000),
+   fParticleName(""),
+   fParticleDefinition(""),
    fEdep(0.),
    fPos(G4ThreeVector()),
    fTime(-1000.)
@@ -62,6 +64,8 @@ PHONONScintHit::PHONONScintHit(const PHONONScintHit& right)
   fTrackID   = right.fTrackID;
   //fChamberNb = right.fChamberNb;
   fPDGCode   = right.fPDGCode;
+  fParticleName = right.fParticleName;
+  fParticleDefinition = right.fParticleDefinition;
   fEdep      = right.fEdep;
   fPos       = right.fPos;
   fTime      = right.fTime;
@@ -74,6 +78,8 @@ const PHONONScintHit& PHONONScintHit::operator=(const PHONONScintHit& right)
   fTrackID   = right.fTrackID;
   //fChamberNb = right.fChamberNb;
   fPDGCode   = right.fPDGCode;
+  fParticleName = right.fParticleName;
+  fParticleDefinition = right.fParticleDefinition;
   fEdep      = right.fEdep;
   fPos       = right.fPos;
   fTime      = right.fTime;

@@ -67,11 +67,15 @@ class PHONONScintHit : public G4VHit
     void SetPDGCode  (G4int pdg)        { fPDGCode = pdg; };
     //void SetChamberNb(G4int chamb)      { fChamberNb = chamb; };
     void SetEdep     (G4double de)      { fEdep = de; };
+    void SetParticleName(const G4String& name) { fParticleName = name; };
+    void SetParticleDefinition(const G4String& def) { fParticleDefinition = def; };
     void SetPos      (G4ThreeVector xyz){ fPos = xyz; };
 
     // Get methods
     G4int GetTrackID() const     { return fTrackID; };
     G4int GetPDGCode() const     { return fPDGCode; };
+    G4String GetParticleName() const { return fParticleName; };
+    G4String GetParticleDefinition() const { return fParticleDefinition; };
     //G4int GetChamberNb() const   { return fChamberNb; };
     G4double GetEdep() const     { return fEdep; };
     G4ThreeVector GetPos() const { return fPos; };
@@ -82,6 +86,8 @@ class PHONONScintHit : public G4VHit
 
       G4int         fTrackID;
       G4int         fPDGCode; // Particle PDG code, initialized to -1000
+      G4String      fParticleName; // Particle name, initialized to empty string
+      G4String      fParticleDefinition; // Particle definition, initialized to empty string
       //G4int         fChamberNb;
       G4double      fEdep;
       G4ThreeVector fPos;

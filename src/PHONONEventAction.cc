@@ -148,17 +148,21 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
           fOutputFile << "Event ID: " << eventID
                       << ", Track ID: " << hit->GetTrackID()
                       << ", PDG Code: " << hit->GetPDGCode()
+                      << ", Particle Name: " << hit->GetParticleName()
                       //<< ", Chamber Number: " << hit->GetChamberNb()
                       << ", Energy Deposit: " << hit->GetEdep()
-                      << ", Position: " << hit->GetPos() << G4endl;
+                      << ", Position: " << hit->GetPos() << G4endl;              
+        // Fill the analysis ntuple
           analysisManager->FillNtupleDColumn(1, 0, eventID);
           analysisManager->FillNtupleDColumn(1, 1, hit->GetTrackID());
           analysisManager->FillNtupleDColumn(1, 2, hit->GetPDGCode());
-          analysisManager->FillNtupleDColumn(1, 3, hit->GetEdep());
-          analysisManager->FillNtupleDColumn(1, 4, hit->GetPos().x());
-          analysisManager->FillNtupleDColumn(1, 5, hit->GetPos().y());
-          analysisManager->FillNtupleDColumn(1, 6, hit->GetPos().z());
-          analysisManager->FillNtupleDColumn(1, 7, hit->GetTime());
+          analysisManager->FillNtupleSColumn(1, 3, hit->GetParticleName());
+          analysisManager->FillNtupleSColumn(1, 4, hit->GetParticleDefinition());
+          analysisManager->FillNtupleDColumn(1, 5, hit->GetEdep());
+          analysisManager->FillNtupleDColumn(1, 6, hit->GetPos().x());
+          analysisManager->FillNtupleDColumn(1, 7, hit->GetPos().y());
+          analysisManager->FillNtupleDColumn(1, 8, hit->GetPos().z());
+          analysisManager->FillNtupleDColumn(1, 9, hit->GetTime());
           analysisManager->AddNtupleRow(1);
         }
     }
