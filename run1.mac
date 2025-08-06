@@ -50,4 +50,4 @@
 /gps/pos/centre -1.01 0. 0. m
 /gps/direction 1. 0. 0.
 
-/run/beamOn 10000
+/run/beamOn 100000

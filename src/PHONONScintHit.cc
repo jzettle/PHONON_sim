@@ -49,6 +49,8 @@ PHONONScintHit::PHONONScintHit()
    fParticleDefinition(""),
    fEdep(0.),
    fPos(G4ThreeVector()),
+   fMomentum(G4ThreeVector()),
+   fMomentumDirection(G4ThreeVector()),
    fTime(-1000.)
 {}
 
@@ -68,6 +70,8 @@ PHONONScintHit::PHONONScintHit(const PHONONScintHit& right)
   fParticleDefinition = right.fParticleDefinition;
   fEdep      = right.fEdep;
   fPos       = right.fPos;
+  fMomentum = right.fMomentum;
+  fMomentumDirection = right.fMomentumDirection;
   fTime      = right.fTime;
 }
 
@@ -82,6 +86,8 @@ const PHONONScintHit& PHONONScintHit::operator=(const PHONONScintHit& right)
   fParticleDefinition = right.fParticleDefinition;
   fEdep      = right.fEdep;
   fPos       = right.fPos;
+  fMomentum = right.fMomentum;
+  fMomentumDirection = right.fMomentumDirection;
   fTime      = right.fTime;
 
   return *this;

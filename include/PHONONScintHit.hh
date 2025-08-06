@@ -70,6 +70,9 @@ class PHONONScintHit : public G4VHit
     void SetParticleName(const G4String& name) { fParticleName = name; };
     void SetParticleDefinition(const G4String& def) { fParticleDefinition = def; };
     void SetPos      (G4ThreeVector xyz){ fPos = xyz; };
+    void SetMomentum(const G4ThreeVector& momentum) { fMomentum = momentum; };
+    void SetMomentumDirection(const G4ThreeVector& dir) { fMomentumDirection = dir; };
+    void SetTime(G4double time) { fTime = time; }
 
     // Get methods
     G4int GetTrackID() const     { return fTrackID; };
@@ -79,8 +82,9 @@ class PHONONScintHit : public G4VHit
     //G4int GetChamberNb() const   { return fChamberNb; };
     G4double GetEdep() const     { return fEdep; };
     G4ThreeVector GetPos() const { return fPos; };
+    G4ThreeVector GetMomentum() const { return fMomentum; };
+    G4ThreeVector GetMomentumDirection() const { return fMomentumDirection; };
     G4double GetTime() const { return fTime; }
-    void SetTime(G4double time) { fTime = time; }
 
   private:
 
@@ -91,6 +95,8 @@ class PHONONScintHit : public G4VHit
       //G4int         fChamberNb;
       G4double      fEdep;
       G4ThreeVector fPos;
+      G4ThreeVector fMomentum; // Momentum direction of the hit particle
+      G4ThreeVector fMomentumDirection; // Momentum direction of the hit particle
       G4double      fTime; // Time of hit, initialized to -1000
       std::ofstream fOutputFile; // Output file for hit collection information
 };

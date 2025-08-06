@@ -55,7 +55,7 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
 
   G4cout << "Opening Analysis Manager for run." << G4endl;
   G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
-  analysisManager->OpenFile("no_shield_10kneutrons.root");
+  analysisManager->OpenFile("shielded_50kneutrons.root");
   //G4cout << "Analysis Manager created." << G4endl;
   //analysisManager->SetVerboseLevel(1);
   //analysisManager->SetNtupleMerging(true);  // Required for parallel run (multithreading)
@@ -83,6 +83,12 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("PositionX");
   analysisManager->CreateNtupleDColumn("PositionY");
   analysisManager->CreateNtupleDColumn("PositionZ");
+  analysisManager->CreateNtupleDColumn("MomentumX");
+  analysisManager->CreateNtupleDColumn("MomentumY");
+  analysisManager->CreateNtupleDColumn("MomentumZ");
+  analysisManager->CreateNtupleDColumn("MomentumDirectionX");
+  analysisManager->CreateNtupleDColumn("MomentumDirectionY");
+  analysisManager->CreateNtupleDColumn("MomentumDirectionZ");
   analysisManager->CreateNtupleDColumn("HitTime");
   analysisManager->FinishNtuple();
   G4cout << "Analysis Manager created." << G4endl;

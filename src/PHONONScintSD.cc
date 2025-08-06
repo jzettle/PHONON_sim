@@ -94,6 +94,8 @@ G4bool PHONONScintSD::ProcessHits(G4Step* aStep,
   
   newHit->SetEdep(edep);
   newHit->SetPos (aStep->GetPostStepPoint()->GetPosition()/mm);
+  newHit->SetMomentum(aStep->GetPostStepPoint()->GetMomentum()/MeV);
+  newHit->SetMomentumDirection(aStep->GetPostStepPoint()->GetMomentumDirection());
   newHit->SetTime(aStep->GetPostStepPoint()->GetGlobalTime()/ns); //use the global time for now, think about this more if it matters (i.e. decays)
   //test
   fHitsCollection->insert( newHit );

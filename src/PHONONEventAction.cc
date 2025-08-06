@@ -162,7 +162,13 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
           analysisManager->FillNtupleDColumn(1, 6, hit->GetPos().x());
           analysisManager->FillNtupleDColumn(1, 7, hit->GetPos().y());
           analysisManager->FillNtupleDColumn(1, 8, hit->GetPos().z());
-          analysisManager->FillNtupleDColumn(1, 9, hit->GetTime());
+          analysisManager->FillNtupleDColumn(1, 9, hit->GetMomentum().x());
+          analysisManager->FillNtupleDColumn(1, 10, hit->GetMomentum().y());
+          analysisManager->FillNtupleDColumn(1, 11, hit->GetMomentum().z());
+          analysisManager->FillNtupleDColumn(1, 12, hit->GetMomentumDirection().x());
+          analysisManager->FillNtupleDColumn(1, 13, hit->GetMomentumDirection().y());
+          analysisManager->FillNtupleDColumn(1, 14, hit->GetMomentumDirection().z());
+          analysisManager->FillNtupleDColumn(1, 15, hit->GetTime());
           analysisManager->AddNtupleRow(1);
         }
     }

@@ -49,6 +49,9 @@
 #include "G4GeometryTolerance.hh"
 #include "G4GeometryManager.hh"
 
+#include "G4GDMLParser.hh"
+#include "G4LogicalVolumeStore.hh"
+
 #include "G4UserLimits.hh"
 
 #include "G4VisAttributes.hh"
@@ -137,25 +140,8 @@ G4VPhysicalVolume* PHONONDetectorConstruction::DefineVolumes()
   G4Material* air  = G4Material::GetMaterial("G4_AIR");
 
   // Sizes of the principal geometrical components (solids)
-  
-  //G4int NbOfChambers = 5;
-  //G4double chamberSpacing = 80*cm; // from chamber center to center!
 
-  //G4double chamberWidth = 20.0*cm; // width of the chambers
-  //G4double targetLength =  5.0*cm; // full length of Target
-  
-  //G4double trackerLength = (NbOfChambers+1)*chamberSpacing;
-
-  //G4double worldLength = 1.2 * (2*targetLength + trackerLength);
-  G4double worldLength = 5*m; // World size
-
-  //G4double targetRadius  = 0.5*targetLength;   // Radius of Target
-  //targetLength = 0.5*targetLength;             // Half length of the Target  
-  //G4double trackerSize   = 0.5*trackerLength;  // Half length of the Tracker
-
-  // Definitions of Solids, Logical Volumes, Physical Volumes
-
-  // World
+  G4double worldLength = 50*m; // World size
 
   G4GeometryManager::GetInstance()->SetWorldMaximumExtent(worldLength);
 
@@ -163,157 +149,18 @@ G4VPhysicalVolume* PHONONDetectorConstruction::DefineVolumes()
          << G4GeometryTolerance::GetInstance()->GetSurfaceTolerance()/mm
          << " mm" << G4endl;
 
-  G4Box* worldS 
-    = new G4Box("world",                                    //its name
-                worldLength/2,worldLength/2,worldLength/2); //its size
-  G4LogicalVolume* worldLV
-    = new G4LogicalVolume(
-                 worldS,   //its solid
-                 air,      //its material
-                 "World"); //its name
+  G4GDMLParser parser;
+  G4String gdml_file = "gdml/scintillator_shield/ScintillatorShield.gdml";
+  G4cout << "Reading GDML file at:" << gdml_file << G4endl;
+  G4cout << "GDML: Reading World!" << G4endl;
+  parser.Read(gdml_file.c_str());
+  G4VPhysicalVolume* worldPhys = parser.GetWorldVolume();
+
+  G4LogicalVolumeStore *logvolstore = G4LogicalVolumeStore::GetInstance();
+  fLogicChamber = logvolstore->GetVolume("ScintLog");
+
+  return worldPhys;
   
-  //  Must place the World Physical volume unrotated at (0,0,0).
-  // 
-  G4VPhysicalVolume* worldPV
-    = new G4PVPlacement(
-                 0,               // no rotation
-                 G4ThreeVector(), // at (0,0,0)
-                 worldLV,         // its logical volume
-                 "World",         // its name
-                 0,               // its mother  volume
-                 false,           // no boolean operations
-                 0,               // copy number
-                 fCheckOverlaps); // checking overlaps 
-
-
-  // Register the world volume in the auto-delete store
-  //G4AutoDelete::Register(worldPV);
-
-  double totalThickness = 100*cm; // Total thickness of the full shield structure
-  double PbShieldThickness = 10*cm; // Thickness of the lead shield
-  double WaterShieldThickness = 20*cm; // Thickness of the water shield
-  double ScintThickness = totalThickness - (PbShieldThickness*2.0) - (WaterShieldThickness*2.0);
-  // Lead shield
-  G4Box* PbShieldS
-     = new G4Box("PbShield", totalThickness/2, totalThickness/2, totalThickness/2);
-  G4LogicalVolume* PbShieldLV
-      = new G4LogicalVolume(PbShieldS, fPbShieldMaterial, "PbShield", 0, 0, 0);
-  
-  G4VPhysicalVolume* PbShieldPV
-     = new G4PVPlacement(0,              // no rotation
-                    G4ThreeVector(0, 0, PbShieldThickness/2), // at (x,y,z)
-                    PbShieldLV,    // its logical volume
-                    "PbShield",    // its name
-                    worldLV,       // its mother volume
-                    false,         // no boolean operations
-                    0,             // copy number
-                    fCheckOverlaps); // checking overlaps */  
-  
-  G4Box* WaterShieldS
-     = new G4Box("WaterShield", (totalThickness-WaterShieldThickness)/2, (totalThickness-WaterShieldThickness)/2, (totalThickness-WaterShieldThickness)/2);
-  G4LogicalVolume* WaterShieldLV
-      = new G4LogicalVolume(WaterShieldS, fWaterShieldMaterial, "WaterShield", 0, 0, 0);
-  
-  G4VPhysicalVolume* WaterShieldPV
-     = new G4PVPlacement(0,              // no rotation
-                    G4ThreeVector(0, 0, 0), // at (x,y,z)
-                    WaterShieldLV,  // its logical volume
-                    "WaterShield",  // its name   
-                    PbShieldLV,       // its mother volume
-                    false,         // no boolean operations
-                    0,             // copy number
-                    fCheckOverlaps); // checking overlaps */
-
-  // make chamber out of vacuum instead of air, more likely how the dil fridge will work
-  G4Box* AirS
-    = new G4Box("AirChamber", 0.5*ScintThickness, 0.5*ScintThickness, 0.5*ScintThickness);
-  G4LogicalVolume *AirChamberLV 
-    = new G4LogicalVolume(AirS, fVacuumMaterial, "AirChamber", 0, 0, 0);
-  G4VPhysicalVolume* AirChamberPV
-    = new G4PVPlacement(0,              // no rotation
-                    G4ThreeVector(0, 0, 0), // at (x,y,z)
-                    AirChamberLV, // its logical volume      
-                    "AirChamber",     // its name
-                    WaterShieldLV, // its mother volume
-                    //worldLV,
-                    false,         // no boolean operations
-                    0,             // copy number
-                    fCheckOverlaps); // checking overlaps*/
-
-  //Scintillator Chamber
-  G4Box* chamberS
-    = new G4Box("ScintChamber", 20*mm, 20*mm, 20*mm);
-
-  //subtract the scintillator from the air chamber
-  /*
-  G4SubtractionSolid* chamberS2
-    = new G4SubtractionSolid("ScintChamberSub", chamberS, AirS, 0, G4ThreeVector(-0.15*m, 0, 0));
-
-  //subtract the air chamber from the water shield
-  G4SubtractionSolid* chamberS3
-    = new G4SubtractionSolid("ScintChamberSub2", AirS, WaterShieldS, 0, G4ThreeVector(0.15*m, 0, 0));
-
-  //subtract the water shield from the lead shield
-  G4SubtractionSolid* chamberS4
-    = new G4SubtractionSolid("ScintChamberSub3", PbShieldS, WaterShieldS, 0, G4ThreeVector(0, 0, 0));
-      */
-  fLogicChamber 
-    = new G4LogicalVolume(chamberS, fChamberMaterial, "Chamber", 0, 0, 0);
-  /*
-  //create logical volumes for the subtraction solids
-  G4LogicalVolume* chamberS2LV
-    = new G4LogicalVolume(chamberS2, air, "ScintChamberSub", 0, 0, 0);  
-
-  G4LogicalVolume* chamberS3LV
-    = new G4LogicalVolume(chamberS3, fWaterShieldMaterial, "ScintChamberSub2", 0, 0, 0);
-  G4LogicalVolume* chamberS4LV
-    = new G4LogicalVolume(chamberS4, fPbShieldMaterial, "ScintChamberSub3", 0, 0, 0);
-  // Place the logical volumes in the world volume
-  G4VPhysicalVolume* chamberS2PV
-    = new G4PVPlacement(0,              // no rotation
-                    G4ThreeVector(0.15*m, 0, 0), // at (x,y,z)
-                    chamberS2LV, // its logical volume      
-                    "ScintChamberSub",     // its name
-                    worldLV, // its mother volume
-                    false,         // no boolean operations
-                    0,             // copy number
-                    fCheckOverlaps); // checking overlaps
-  G4VPhysicalVolume* chamberS3PV
-    = new G4PVPlacement(0,              // no rotation
-                    G4ThreeVector(0, 0, 0), // at (x,y,z)
-                    chamberS3LV, // its logical volume      
-                    "ScintChamberSub2",     // its name
-                    worldLV, // its mother volume
-                    false,         // no boolean operations
-                    0,             // copy number
-                    fCheckOverlaps); // checking overlaps
-  G4VPhysicalVolume* chamberS4PV
-    = new G4PVPlacement(0,              // no rotation
-                    G4ThreeVector(0, 0, 0), // at (x,y,z)
-                    chamberS4LV, // its logical volume      
-                    "ScintChamberSub3",     // its name
-                    worldLV, // its mother volume
-                    false,         // no boolean operations
-                    0,             // copy number
-                    fCheckOverlaps); // checking overlaps
-  
-  */
-
-  G4VPhysicalVolume* chamberPV
-    = new G4PVPlacement(0,              // no rotation
-                    G4ThreeVector(-0.15, 0, 0), // at (x,y,z)
-                    fLogicChamber, // its logical volume      
-                    "Chamber",     // its name
-                    AirChamberLV, // its mother volume
-                    false,         // no boolean operations
-                    0,             // copy number
-                    fCheckOverlaps); // checking overlaps
-
-  G4double maxStep = 0.5*cm; // Maximum step size in the chamber
-  fStepLimit = new G4UserLimits(maxStep);
-  fLogicChamber->SetUserLimits(fStepLimit);
-
-  return worldPV;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
