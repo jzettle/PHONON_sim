@@ -150,10 +150,10 @@ G4VPhysicalVolume* PHONONDetectorConstruction::DefineVolumes()
          << " mm" << G4endl;
 
   G4GDMLParser parser;
-  G4String gdml_file = "gdml/scintillator_shield/ScintillatorShield.gdml";
-  G4cout << "Reading GDML file at:" << gdml_file << G4endl;
+  //G4String gdml_file = "gdml/scintillator_shield/ScintillatorShield.gdml";
+  G4cout << "Reading GDML file at:" << fGDMLFile << G4endl;
   G4cout << "GDML: Reading World!" << G4endl;
-  parser.Read(gdml_file.c_str());
+  parser.Read(fGDMLFile.c_str());
   G4VPhysicalVolume* worldPhys = parser.GetWorldVolume();
 
   G4LogicalVolumeStore *logvolstore = G4LogicalVolumeStore::GetInstance();
@@ -187,6 +187,12 @@ void PHONONDetectorConstruction::ConstructSDandField()
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void PHONONDetectorConstruction::SetGDMLFile(G4String filename)
+{
+  G4cout << "Setting GDML file to: " << filename << G4endl;
+  fGDMLFile = filename;
+}
 
 void PHONONDetectorConstruction::SetTargetMaterial(G4String materialName)
 {

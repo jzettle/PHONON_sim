@@ -56,6 +56,7 @@ class PHONONDetectorConstruction : public G4VUserDetectorConstruction
     virtual void ConstructSDandField();
 
     // Set methods
+    void SetGDMLFile(G4String filename);
     void SetTargetMaterial (G4String );
     void SetChamberMaterial(G4String );
     void SetMaxStep (G4double );
@@ -67,6 +68,9 @@ class PHONONDetectorConstruction : public G4VUserDetectorConstruction
     G4VPhysicalVolume* DefineVolumes();
   
     // data members
+
+    G4String fGDMLFile = ""; // GDML file name for geometry definition
+
     G4LogicalVolume*   fLogicTarget;     // pointer to the logical Target
     G4LogicalVolume*   fLogicChamber;    // pointer to the logical Chamber
 

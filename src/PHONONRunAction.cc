@@ -35,7 +35,8 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 PHONONRunAction::PHONONRunAction()
- : G4UserRunAction()
+ : G4UserRunAction(),
+   fRunMessenger(this)
 { 
   // set printing event number per each 1000 events
   G4RunManager::GetRunManager()->SetPrintProgress(100);     
@@ -55,7 +56,8 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
 
   G4cout << "Opening Analysis Manager for run." << G4endl;
   G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
-  analysisManager->OpenFile("shielded_50kneutrons.root");
+  //analysisManager->OpenFile("shielded_50kneutrons.root");
+  analysisManager->OpenFile(fOutputFile.c_str());
   //G4cout << "Analysis Manager created." << G4endl;
   //analysisManager->SetVerboseLevel(1);
   //analysisManager->SetNtupleMerging(true);  // Required for parallel run (multithreading)
@@ -110,6 +112,12 @@ void PHONONRunAction::EndOfRunAction(const G4Run* )
   analysisManager->Write();
   analysisManager->CloseFile();
 
+}
+
+void PHONONRunAction::SetOutputFile(G4String filename)
+{
+  fOutputFile = filename;
+  G4cout << "Output file set to: " << fOutputFile << G4endl;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

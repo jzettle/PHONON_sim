@@ -40,23 +40,23 @@ PHONONDetectorMessenger::PHONONDetectorMessenger(PHONONDetectorConstruction* Det
  : G4UImessenger(),
    fDetectorConstruction(Det)
 {
-  fB2Directory = new G4UIdirectory("/B2/");
+  fB2Directory = new G4UIdirectory("/PHONON/");
   fB2Directory->SetGuidance("UI commands specific to this example.");
 
-  fDetDirectory = new G4UIdirectory("/B2/det/");
+  fDetDirectory = new G4UIdirectory("/PHONON/det/");
   fDetDirectory->SetGuidance("Detector construction control");
 
-  fTargMatCmd = new G4UIcmdWithAString("/B2/det/setTargetMaterial",this);
-  fTargMatCmd->SetGuidance("Select Material of the Target.");
-  fTargMatCmd->SetParameterName("choice",false);
-  fTargMatCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  fGDMLFileCmd = new G4UIcmdWithAString("/PHONON/det/setGDMLFile",this);
+  fGDMLFileCmd->SetGuidance("Select GDML geometry file to load.");
+  fGDMLFileCmd->SetParameterName("choice",false);
+  fGDMLFileCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  fChamMatCmd = new G4UIcmdWithAString("/B2/det/setChamberMaterial",this);
+  fChamMatCmd = new G4UIcmdWithAString("/PHONON/det/setChamberMaterial",this);
   fChamMatCmd->SetGuidance("Select Material of the Chamber.");
   fChamMatCmd->SetParameterName("choice",false);
   fChamMatCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  fStepMaxCmd = new G4UIcmdWithADoubleAndUnit("/B2/det/stepMax",this);
+  fStepMaxCmd = new G4UIcmdWithADoubleAndUnit("/PHONON/det/stepMax",this);
   fStepMaxCmd->SetGuidance("Define a step max");
   fStepMaxCmd->SetParameterName("stepMax",false);
   fStepMaxCmd->SetUnitCategory("Length");
@@ -67,7 +67,7 @@ PHONONDetectorMessenger::PHONONDetectorMessenger(PHONONDetectorConstruction* Det
 
 PHONONDetectorMessenger::~PHONONDetectorMessenger()
 {
-  delete fTargMatCmd;
+  delete fGDMLFileCmd;
   delete fChamMatCmd;
   delete fStepMaxCmd;
   delete fB2Directory;
@@ -78,8 +78,8 @@ PHONONDetectorMessenger::~PHONONDetectorMessenger()
 
 void PHONONDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 {
-  if( command == fTargMatCmd )
-   { fDetectorConstruction->SetTargetMaterial(newValue);}
+  if( command == fGDMLFileCmd )
+   { fDetectorConstruction->SetGDMLFile(newValue);}
 
   if( command == fChamMatCmd )
    { fDetectorConstruction->SetChamberMaterial(newValue);}

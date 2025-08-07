@@ -6,6 +6,8 @@
 # Change the default number of workers (in multi-threading mode) 
 #/run/numberOfThreads 4
 #
+/PHONON/det/setGDMLFile gdml/scintillator_shield/DetectorNoShield.gdml
+/PHONON/run/setOutputFile no_shielded_250kneutrons.root
 # Initialize kernel
 /run/initialize
 #
@@ -50,4 +52,4 @@
 /gps/pos/centre -1.01 0. 0. m
 /gps/direction 1. 0. 0.
 
-/run/beamOn 100000
+/run/beamOn 250000

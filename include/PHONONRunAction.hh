@@ -31,12 +31,14 @@
 #define PHONONRunAction_h 1
 
 #include "G4UserRunAction.hh"
+#include "PHONONRunActionMessenger.hh"
 #include "globals.hh"
 //#include "g4analysis.hh"
 #include "g4root.hh"
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 class G4Run;
+class PHONONRunActionMessenger;
 
 /// Run action class
 
@@ -49,9 +51,13 @@ class PHONONRunAction : public G4UserRunAction
     virtual void BeginOfRunAction(const G4Run* run);
     virtual void   EndOfRunAction(const G4Run* run);
 
+    void SetOutputFile(G4String filename);
+
 
   private:
     // Add any private members or methods if needed
+    PHONONRunActionMessenger fRunMessenger;
+    G4String fOutputFile = "default.root";  // Output file name for the run
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
