@@ -32,6 +32,8 @@
 #include "G4Run.hh"
 #include "G4RunManager.hh"
 
+
+//#include "G4AnalysisManager.hh"
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 PHONONRunAction::PHONONRunAction()
@@ -53,10 +55,17 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
 { 
   //inform the runManager to save random number seed
   G4RunManager::GetRunManager()->SetRandomNumberStore(false);
+  auto analysisManager = G4GenericAnalysisManager::Instance();
+  // Set the output file name and format
+  analysisManager->SetFileName(fOutputFile);
+  if (fUseHDF5) {
+    analysisManager->SetDefaultFileType("hdf5");
+    G4cout << "Using HDF5 output format." << G4endl;
+  } else {
+    analysisManager->SetDefaultFileType("root");
+    G4cout << "Using ROOT output format." << G4endl;
+  }
 
-  G4cout << "Opening Analysis Manager for run." << G4endl;
-  G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
-  //analysisManager->OpenFile("shielded_50kneutrons.root");
   analysisManager->OpenFile(fOutputFile.c_str());
   //G4cout << "Analysis Manager created." << G4endl;
   //analysisManager->SetVerboseLevel(1);
@@ -104,7 +113,8 @@ void PHONONRunAction::EndOfRunAction(const G4Run* )
   // For example, close output files or finalize statistics
   G4cout << "Run ended successfully." << G4endl;
 
-  G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+  //G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+  auto analysisManager = G4GenericAnalysisManager::Instance();
   if (!analysisManager->IsOpenFile()) {
     G4cerr << "Error: Analysis manager is not open." << G4endl;
     return;
@@ -118,6 +128,12 @@ void PHONONRunAction::SetOutputFile(G4String filename)
 {
   fOutputFile = filename;
   G4cout << "Output file set to: " << fOutputFile << G4endl;
+}
+
+void PHONONRunAction::SetUseHDF5(G4bool useHDF5)
+{
+  fUseHDF5 = useHDF5;
+  G4cout << "Using HDF5 output: " << (useHDF5 ? "Enabled" : "Disabled") << G4endl;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

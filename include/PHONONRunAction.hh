@@ -33,8 +33,10 @@
 #include "G4UserRunAction.hh"
 #include "PHONONRunActionMessenger.hh"
 #include "globals.hh"
+#include "G4GenericAnalysisManager.hh"
 //#include "g4analysis.hh"
-#include "g4root.hh"
+//#include "g4root.hh"
+//#include "g4hdf5.hh"
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 class G4Run;
@@ -52,12 +54,13 @@ class PHONONRunAction : public G4UserRunAction
     virtual void   EndOfRunAction(const G4Run* run);
 
     void SetOutputFile(G4String filename);
-
-
+    void SetUseHDF5(G4bool useHDF5);
+    
   private:
     // Add any private members or methods if needed
     PHONONRunActionMessenger fRunMessenger;
     G4String fOutputFile = "default.root";  // Output file name for the run
+    G4bool fUseHDF5 = false;  // Flag to use HDF5 output format
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

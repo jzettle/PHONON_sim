@@ -8,6 +8,7 @@ class PHONONRunAction;
 class G4UIdirectory;
 class G4UIcmdWithAString;
 class G4UIcmdWithADoubleAndUnit;
+class G4UIcmdWithABool;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -28,6 +29,7 @@ class PHONONRunActionMessenger: public G4UImessenger
 
     G4UIdirectory* fRunDirectory;
     G4UIcmdWithAString* fOutputFileCmd;
+    G4UIcmdWithABool* fUseHDF5Cmd;
 };
 
 #endif

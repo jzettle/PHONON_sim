@@ -70,7 +70,14 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
   G4SDManager* sdManager = G4SDManager::GetSDMpointer();
   G4RunManager* runManager = G4RunManager::GetRunManager();
   const G4Event* currentEvent = runManager->GetCurrentEvent();
-  G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+  auto analysisManager = G4GenericAnalysisManager::Instance();
+  if (!analysisManager->IsOpenFile()) {
+    G4cerr << "Error: Analysis manager is not open." << G4endl;
+    return;
+  }
+  //set file type to HDF5 if required
+  analysisManager->SetDefaultFileType("hdf5");
+  G4cout << "Using HDF5 output format." << G4endl;
 
   G4TrajectoryContainer* trajectoryContainer = event->GetTrajectoryContainer();
   G4int n_trajectories = 0;

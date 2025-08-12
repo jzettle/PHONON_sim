@@ -79,8 +79,8 @@ G4bool PHONONScintSD::ProcessHits(G4Step* aStep,
 
   PHONONScintHit* newHit = new PHONONScintHit();
 
-  newHit->SetTrackID  (aStep->GetTrack()->GetTrackID());
-  newHit->SetPDGCode  (aStep->GetTrack()->GetDefinition()->GetPDGEncoding());
+  newHit->SetTrackID(aStep->GetTrack()->GetTrackID());
+  newHit->SetPDGCode(aStep->GetTrack()->GetDefinition()->GetPDGEncoding());
   newHit->SetParticleName(aStep->GetTrack()->GetDefinition()->GetParticleName());
   G4ParticleDefinition* particleDef = aStep->GetTrack()->GetDefinition();
   //Create a place to store any generic ion information as "GenericIon", otherwise just rewrite the particle name
@@ -93,7 +93,7 @@ G4bool PHONONScintSD::ProcessHits(G4Step* aStep,
   }
   
   newHit->SetEdep(edep);
-  newHit->SetPos (aStep->GetPostStepPoint()->GetPosition()/mm);
+  newHit->SetPos(aStep->GetPostStepPoint()->GetPosition()/mm);
   newHit->SetMomentum(aStep->GetPostStepPoint()->GetMomentum()/MeV);
   newHit->SetMomentumDirection(aStep->GetPostStepPoint()->GetMomentumDirection());
   newHit->SetTime(aStep->GetPostStepPoint()->GetGlobalTime()/ns); //use the global time for now, think about this more if it matters (i.e. decays)
