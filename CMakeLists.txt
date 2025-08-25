@@ -8,6 +8,11 @@ endif()
 project(PHONONBkgnd)
 
 #----------------------------------------------------------------------------
+#Find G4CMP package
+find_package(G4CMP REQUIRED)
+include(${G4CMP_USE_FILE})
+
+#----------------------------------------------------------------------------
 # Find Geant4 package, activating all available UI and Vis drivers by default
 # You can set WITH_GEANT4_UIVIS to OFF via the command line or ccmake/cmake-gui
 # to build a batch mode only executable
@@ -37,7 +42,7 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 # Add the executable, and link it to the Geant4 libraries
 #
 add_executable(PHONONBkgnd PHONONBkgnd.cc ${sources} ${headers})
-target_link_libraries(PHONONBkgnd ${Geant4_LIBRARIES})
+target_link_libraries(PHONONBkgnd ${Geant4_LIBRARIES} ${G4CMP_LIBRARIES})
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we

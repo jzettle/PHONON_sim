@@ -82,6 +82,8 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("PrimaryMomentumX");
   analysisManager->CreateNtupleDColumn("PrimaryMomentumY");
   analysisManager->CreateNtupleDColumn("PrimaryMomentumZ");
+  analysisManager->CreateNtupleDColumn("totalNR");
+  analysisManager->CreateNtupleDColumn("totalER");
   analysisManager->FinishNtuple();
 
   analysisManager->CreateNtuple("Hits", "Hit Data");

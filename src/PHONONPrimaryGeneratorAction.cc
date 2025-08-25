@@ -39,6 +39,10 @@
 #include "G4ParticleDefinition.hh"
 #include "G4SystemOfUnits.hh"
 
+#include "G4PhononTransFast.hh"
+#include "G4PhononTransSlow.hh"
+#include "G4PhononLong.hh"
+
 #include "Randomize.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

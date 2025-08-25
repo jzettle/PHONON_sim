@@ -76,8 +76,8 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
     return;
   }
   //set file type to HDF5 if required
-  analysisManager->SetDefaultFileType("hdf5");
-  G4cout << "Using HDF5 output format." << G4endl;
+  //analysisManager->SetDefaultFileType("root");
+  //G4cout << "Using HDF5 output format." << G4endl;
 
   G4TrajectoryContainer* trajectoryContainer = event->GetTrajectoryContainer();
   G4int n_trajectories = 0;
@@ -97,26 +97,6 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
   //extract primary particle information (this is nicer than going through the trajectory container)
   // Note: This assumes there is at least one primary vertex and one primary particle.
   G4PrimaryParticle* primaryParticle = event->GetPrimaryVertex()->GetPrimary(0);
-  if (primaryParticle) {
-    G4int trackID = primaryParticle->GetTrackID();
-    G4int pdgCode = primaryParticle->GetPDGcode();
-    G4double kineticEnergy = primaryParticle->GetKineticEnergy();
-    //G4ThreeVector position = primaryParticle->GetPosition();
-    G4ThreeVector momentumDirection = primaryParticle->GetMomentumDirection();
-    analysisManager->FillNtupleDColumn(0, 0, eventID);
-    analysisManager->FillNtupleDColumn(0, 1, trackID);
-    analysisManager->FillNtupleDColumn(0, 2, pdgCode);
-    analysisManager->FillNtupleDColumn(0, 3, kineticEnergy);
-    analysisManager->FillNtupleDColumn(0, 4, primary_x);
-    analysisManager->FillNtupleDColumn(0, 5, primary_y);
-    analysisManager->FillNtupleDColumn(0, 6, primary_z);
-    analysisManager->FillNtupleDColumn(0, 7, momentumDirection.x());
-    analysisManager->FillNtupleDColumn(0, 8, momentumDirection.y());
-    analysisManager->FillNtupleDColumn(0, 9, momentumDirection.z());
-    analysisManager->AddNtupleRow(0);
-  
-  }
-
 
   // periodic printing
   if ( eventID < 100 || eventID % 100 == 0) {
@@ -147,6 +127,9 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
   //open the output file for appending
   fOutputFile.open("hits.txt", std::ios::app);
 
+  G4double totalNR = 0.0;
+  G4double totalER = 0.0;
+
   if (myHitsCollection) {
     for (unsigned int i = 0; i < myHitsCollection->entries(); ++i) {
       PHONONScintHit* hit = (*myHitsCollection)[i];
@@ -158,7 +141,11 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
                       << ", Particle Name: " << hit->GetParticleName()
                       //<< ", Chamber Number: " << hit->GetChamberNb()
                       << ", Energy Deposit: " << hit->GetEdep()
-                      << ", Position: " << hit->GetPos() << G4endl;              
+                      << ", Position: " << hit->GetPos() << G4endl;    
+        if( (hit->GetParticleName().find("Li") != std::string::npos) || (hit->GetParticleName().find("Nb") != std::string::npos) || (hit->GetParticleName().find("O") != std::string::npos) ) 
+        {
+          totalNR += hit->GetEdep();
+        }         
         // Fill the analysis ntuple
           analysisManager->FillNtupleDColumn(1, 0, eventID);
           analysisManager->FillNtupleDColumn(1, 1, hit->GetTrackID());
@@ -179,7 +166,28 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
           analysisManager->AddNtupleRow(1);
         }
     }
-  } 
+  }
+  
+  if (primaryParticle) {
+    G4int trackID = primaryParticle->GetTrackID();
+    G4int pdgCode = primaryParticle->GetPDGcode();
+    G4double kineticEnergy = primaryParticle->GetKineticEnergy();
+    //G4ThreeVector position = primaryParticle->GetPosition();
+    G4ThreeVector momentumDirection = primaryParticle->GetMomentumDirection();
+    analysisManager->FillNtupleDColumn(0, 0, eventID);
+    analysisManager->FillNtupleDColumn(0, 1, trackID);
+    analysisManager->FillNtupleDColumn(0, 2, pdgCode);
+    analysisManager->FillNtupleDColumn(0, 3, kineticEnergy);
+    analysisManager->FillNtupleDColumn(0, 4, primary_x);
+    analysisManager->FillNtupleDColumn(0, 5, primary_y);
+    analysisManager->FillNtupleDColumn(0, 6, primary_z);
+    analysisManager->FillNtupleDColumn(0, 7, momentumDirection.x());
+    analysisManager->FillNtupleDColumn(0, 8, momentumDirection.y());
+    analysisManager->FillNtupleDColumn(0, 9, momentumDirection.z());
+    analysisManager->FillNtupleDColumn(0, 10, totalNR);
+    analysisManager->FillNtupleDColumn(0, 11, totalER);
+    analysisManager->AddNtupleRow(0);
+  }
   fOutputFile.close(); 
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
