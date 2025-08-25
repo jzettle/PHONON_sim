@@ -7,7 +7,7 @@
 #/run/numberOfThreads 4
 #
 /PHONON/det/setGDMLFile gdml/scintillator_shield/DetectorNoShield.gdml
-/PHONON/run/setOutputFile no_shielded_250kneutrons_higherEprimary.root
+/PHONON/run/setOutputFile no_shielded_testnewoutput_higherEprimary.root
 # Initialize kernel
 /run/initialize
 #

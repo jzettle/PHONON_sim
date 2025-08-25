@@ -10,7 +10,7 @@
 /PHONON/run/useHDF5 false
 #/PHONON/run/setOutputFile shielded_testfiletypesetting
 #/PHONON/run/setOutputFile shielded_testfiletypesetting_higherEprimary
-/PHONON/run/setOutputFile shielded_250kneutrons_higherEprimary.root
+/PHONON/run/setOutputFile shielded_testnewoutput_higherEprimary.root
 
 # Initialize kernel
 /run/initialize

@@ -22,6 +22,7 @@
     <position name="shieldPos" unit="m" x="1.25" y="0.0" z="0.0" /> 
     <position name="steelPos" unit="m" x="1.75" y="0.0" z="0.0" /> -->
     <position name="scintSub" unit="m" x="-0.15" y="0.0" z="0.0" />
+    <position name="sensorSub" unit="m" x="-0.13" y="0.0" z="0.0" />
     <position name="waterShieldSub" unit="m" x="0.15" y="0.0" z="0.0" />
     <!--<position name="cuSub" unit="m" x="-0.50" y="0.0" z="0.0" />
     <position name="steelSub" unit="m" x="-0.50" y="0.0" z="0.0" /> -->
@@ -51,7 +52,9 @@
     </element>
     <element name="Niobium" formula="Nb" Z="41"> <atom value="92.906"/>
     </element>
-    <material name="Air">
+    <element name="Silicon" formula="Si" Z="14"> <atom value="28.085"/>
+    </element>
+    <material name="Air"> 
       <D value="1.290" unit="mg/cm3"/>
       <fraction n="0.7" ref="Nitrogen"/>
       <fraction n="0.3" ref="Oxygen"/>
@@ -99,12 +102,18 @@
       <composite n="2" ref="Hydrogen"/>
       <composite n="1" ref="Oxygen"/>
     </material>
+    <material name="SiC">
+      <D value="3.16" unit="g/cm3"/>
+      <composite n="1" ref="Silicon"/>
+      <composite n="1" ref="Carbon"/>
+    </material> 
   </materials>  
   
   <solids>
     <box name="WorldSolid" lunit="mm" x="5000.0" y="5000.0" z="5000.0" />
     <!-- z is the "beam direction here"-->
     <box name="ScintillatorSolid" lunit="mm" x="40.0" y="40.0" z="40.0" />
+    <box name="SensorSolid" lunit="mm" x="5.0" y="40.0" z="40.0" />
     <box name="AirSolid" lunit="mm" x="700.0" y="400.0" z="400.0" />
     <!--<box name="TargetSolid" lunit="mm" x="1500.0" y="200.0" z="200.0" /> -->
     <box name="WaterShieldSolid" lunit="mm" x="800.0" y="800.0" z="800.0" />
@@ -113,6 +122,12 @@
     <subtraction name="DetectorCavity">
       <first ref="AirSolid"/>
       <second ref="ScintillatorSolid"/>
+      <positionref ref="scintSub" />
+    </subtraction>
+
+    <subtraction name="SensorCavity">
+      <first ref="AirSolid"/>
+      <second ref="SensorSolid"/>
       <positionref ref="scintSub" />
     </subtraction>
 
@@ -142,6 +157,11 @@
       <solidref ref="ScintillatorSolid" />
     </volume>
 
+    <volume name="SensorLog">
+      <materialref ref="SiC" />
+      <solidref ref="SensorSolid" />
+    </volume> 
+
     <volume name="AirLog">
       <materialref ref="Vacuum" />
       <solidref ref="DetectorCavity" />
@@ -165,6 +185,11 @@
   <volumeref ref="ScintLog" />
 	<positionref ref="scintPos" />
       </physvol>
+
+    <physvol name="SensorVol" >
+  <volumeref ref="SensorLog" />
+  <positionref ref="scintPos" />
+    </physvol>
 
       <physvol name="AirVol" >
   <volumeref ref="AirLog" />

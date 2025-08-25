@@ -83,7 +83,7 @@ G4bool PHONONScintSD::ProcessHits(G4Step* aStep,
   newHit->SetPDGCode(aStep->GetTrack()->GetDefinition()->GetPDGEncoding());
   newHit->SetParticleName(aStep->GetTrack()->GetDefinition()->GetParticleName());
   G4ParticleDefinition* particleDef = aStep->GetTrack()->GetDefinition();
-  //Create a place to store any generic ion information as "GenericIon", otherwise just rewrite the particle name
+  //Create a place to store any generic ion information as "GenericIon", otherwise just rewrite the particle name, seems to always write the particle name...
   if (particleDef == G4GenericIon::GenericIon()) {
     newHit->SetParticleDefinition("GenericIon");
   }

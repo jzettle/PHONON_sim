@@ -36,11 +36,17 @@
 #include "FTFP_BERT.hh"
 #include "Shielding.hh"
 #include "G4StepLimiterPhysics.hh"
+#include "G4CMPPhysicsList.hh"
+#include "G4CMPPhysics.hh"
+#include "G4CMPConfigManager.hh"
+#include "PHONONConfigManager.hh"
 
 #include "Randomize.hh"
 
 #include "G4VisExecutive.hh"
 #include "G4UIExecutive.hh"
+
+#include <time.h>
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -53,8 +59,14 @@ int main(int argc,char** argv)
     ui = new G4UIExecutive(argc, argv);
   }
 
+  G4int seed = time(0); // returns time in seconds as an int
+  time_t start_time = seed;
+
   // Optionally: choose a different Random engine...
   // G4Random::setTheEngine(new CLHEP::MTwistEngine);
+
+  G4Random::setTheEngine(new CLHEP::RanecuEngine);
+  G4Random::setTheSeed(seed);
   
   // Construct the default run manager
   //
@@ -67,10 +79,14 @@ int main(int argc,char** argv)
 
   G4VModularPhysicsList* physicsList = new Shielding;
   physicsList->RegisterPhysics(new G4StepLimiterPhysics());
+  physicsList->RegisterPhysics(new G4CMPPhysics);
   runManager->SetUserInitialization(physicsList);
     
   // Set user action classes
   runManager->SetUserInitialization(new PHONONActionInitialization());
+
+  G4CMPConfigManager::Instance();
+  PHONONConfigManager::Instance();
   
   // Initialize visualization
   //

@@ -39,6 +39,8 @@ class G4LogicalVolume;
 class G4Material;
 class G4UserLimits;
 class G4GlobalMagFieldMessenger;
+class G4CMPSurfaceProperty;
+class G4CMPElectrodeSensitivity;
 
 class PHONONDetectorMessenger;
 
@@ -66,6 +68,7 @@ class PHONONDetectorConstruction : public G4VUserDetectorConstruction
     // methods
     void DefineMaterials();
     G4VPhysicalVolume* DefineVolumes();
+    void AttachPhononSensor(G4CMPSurfaceProperty* surfProp);
   
     // data members
 
@@ -73,6 +76,12 @@ class PHONONDetectorConstruction : public G4VUserDetectorConstruction
 
     G4LogicalVolume*   fLogicTarget;     // pointer to the logical Target
     G4LogicalVolume*   fLogicChamber;    // pointer to the logical Chamber
+    G4LogicalVolume*   fSensorLogic;     // pointer to the logical Sensor
+
+    G4VPhysicalVolume*  fScintPhys; // pointer to the physical Chamber
+    G4VPhysicalVolume*  fAirPhys; // pointer to the air Chamber
+    G4VPhysicalVolume*  fSensorPhys; // pointer to the sensor Chamber
+
 
     G4Material*        fPbShieldMaterial;  // pointer to the lead shield material
     G4Material*        fWaterShieldMaterial; // pointer to the water shield material
@@ -87,6 +96,10 @@ class PHONONDetectorConstruction : public G4VUserDetectorConstruction
                                          // magnetic field messenger
     
     G4bool  fCheckOverlaps; // option to activate checking of volumes overlaps 
+
+    G4CMPElectrodeSensitivity* electrodeSensitivity;
+    G4CMPSurfaceProperty* topSurfProp;
+    G4CMPSurfaceProperty* wallSurfProp;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
