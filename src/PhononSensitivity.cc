@@ -114,14 +114,20 @@ G4bool PhononSensitivity::IsHit(const G4Step* step,
   const G4TouchableHandle touch1 = postStepPoint->GetTouchableHandle();
   const G4VPhysicalVolume* volume = touch1->GetVolume();
   const G4String name = volume->GetName();
+  //G4cout << name << G4endl;
 
   G4bool correctParticle = particle == G4PhononLong::Definition() ||
                            particle == G4PhononTransFast::Definition() ||
                            particle == G4PhononTransSlow::Definition();
+  //if(correctParticle) G4cout << "PhononSensitivity::IsHit: got phonon particle." << G4endl;
 
   G4bool correctStatus = step->GetTrack()->GetTrackStatus() == fStopAndKill &&
                          postStepPoint->GetStepStatus() == fGeomBoundary &&
-                         step->GetNonIonizingEnergyDeposit() > 0. && name=="SensorVol";
+                         step->GetNonIonizingEnergyDeposit() > 0. && name=="ScintillatorVol";
+  //if(correctStatus) G4cout << "PhononSensitivity::IsHit: got correct status." << G4endl;
+
+  //if(correctParticle && correctStatus)
+    //G4cout << "PhononSensitivity::IsHit: registering hit." << G4endl;
 
   return correctParticle && correctStatus;
 }
