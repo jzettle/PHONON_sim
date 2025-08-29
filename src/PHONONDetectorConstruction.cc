@@ -193,7 +193,7 @@ void PHONONDetectorConstruction::ConstructSDandField()
 
   G4LatticeManager* LM = G4LatticeManager::GetLatticeManager();
   //G4LatticeLogical* GeLogical = LM->LoadLattice(fChamberMaterial, "Ge");
-  G4LatticeLogical* NbLogical = LM->LoadLattice(fChamberMaterial, "Si");
+  G4LatticeLogical* NbLogical = LM->LoadLattice(fChamberMaterial, "LiNbO3");
 
   // G4LatticePhysical assigns G4LatticeLogical a physical orientation
   G4LatticePhysical* NbPhysical = new G4LatticePhysical(NbLogical);

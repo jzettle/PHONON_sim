@@ -59,8 +59,8 @@ void PhononSensitivity::EndOfEvent(G4HCofThisEvent* HCE) {
   auto* hitCol = static_cast<G4CMPElectrodeHitsCollection*>(HCE->GetHC(HCID));
   std::vector<G4CMPElectrodeHit*>* hitVec = hitCol->GetVector();
   G4cout << "Got " << hitVec->size() << " phonon-based hits." << G4endl;
-  G4RunManager* runMan = G4RunManager::GetRunManager();
-
+  //G4RunManager* runMan = G4RunManager::GetRunManager();
+  /*
   if (output.good()) {
     for (G4CMPElectrodeHit* hit : *hitVec) {
       output << runMan->GetCurrentRun()->GetRunID() << ','
@@ -80,6 +80,7 @@ void PhononSensitivity::EndOfEvent(G4HCofThisEvent* HCE) {
              << hit->GetFinalTime()/ns << '\n';
     }
   }
+  */
 }
 
 void PhononSensitivity::SetOutputFile(const G4String &fn) {

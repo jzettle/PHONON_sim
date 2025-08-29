@@ -33,6 +33,8 @@
 
 #include "G4Event.hh"
 #include "G4EventManager.hh"
+#include "G4CMPElectrodeHit.hh"
+#include "G4SystemOfUnits.hh"
 #include "G4TrajectoryContainer.hh"
 #include "G4Trajectory.hh"
 #include "G4PrimaryParticle.hh"
@@ -133,7 +135,9 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
   if (myHitsCollection) {
     for (unsigned int i = 0; i < myHitsCollection->entries(); ++i) {
       PHONONScintHit* hit = (*myHitsCollection)[i];
+      
       if (hit) {
+      /*
         // Output hit information to the file
           fOutputFile << "Event ID: " << eventID
                       << ", Track ID: " << hit->GetTrackID()
@@ -142,6 +146,7 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
                       //<< ", Chamber Number: " << hit->GetChamberNb()
                       << ", Energy Deposit: " << hit->GetEdep()
                       << ", Position: " << hit->GetPos() << G4endl;    
+        */
         if( (hit->GetParticleName().find("Li") != std::string::npos) || (hit->GetParticleName().find("Nb") != std::string::npos) || (hit->GetParticleName().find("O") != std::string::npos) ) 
         {
           totalNR += hit->GetEdep();
@@ -188,6 +193,43 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
     analysisManager->FillNtupleDColumn(0, 11, totalER);
     analysisManager->AddNtupleRow(0);
   }
+
+  //add phonon hit information to the output trees
+  collectionID = sdManager->GetCollectionID("PhononElectrode/G4CMPElectrodeHit");
+  if (collectionID < 0) {
+    G4cerr << "Phonon Hits collection not found, proceeding!" << G4endl;
+    return;
+  }
+
+  G4CMPElectrodeHitsCollection* phononHC = 0;
+  if (HCofEvent) {
+      phononHC = static_cast<G4CMPElectrodeHitsCollection*>(HCofEvent->GetHC(collectionID));
+  } 
+  if (phononHC) {
+    for (unsigned int i = 0; i < phononHC->entries(); ++i) {
+      G4CMPElectrodeHit* hit = (*phononHC)[i];
+      if (hit) {
+          analysisManager->FillNtupleDColumn(2, 0, eventID);
+          analysisManager->FillNtupleDColumn(2, 1, hit->GetTrackID());
+          analysisManager->FillNtupleSColumn(2, 2, hit->GetParticleName());
+          analysisManager->FillNtupleDColumn(2, 3, hit->GetStartEnergy());
+          analysisManager->FillNtupleDColumn(2, 4, hit->GetStartPosition().x());
+          analysisManager->FillNtupleDColumn(2, 5, hit->GetStartPosition().y());
+          analysisManager->FillNtupleDColumn(2, 6, hit->GetStartPosition().z());
+          analysisManager->FillNtupleDColumn(2, 7, hit->GetStartTime());
+          analysisManager->FillNtupleDColumn(2, 8, hit->GetEnergyDeposit()/eV);
+          analysisManager->FillNtupleDColumn(2, 9, hit->GetWeight());
+          analysisManager->FillNtupleDColumn(2, 10, hit->GetFinalPosition().x());
+          analysisManager->FillNtupleDColumn(2, 11, hit->GetFinalPosition().y());
+          analysisManager->FillNtupleDColumn(2, 12, hit->GetFinalPosition().z());
+          analysisManager->FillNtupleDColumn(2, 13, hit->GetFinalTime());
+          analysisManager->AddNtupleRow(2);
+      }
+    }
+  }
+
+
+
   fOutputFile.close(); 
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
