@@ -122,6 +122,20 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("EndTime");
   analysisManager->FinishNtuple();
 
+  analysisManager->CreateNtuple("WaterNeutrons", "Neutron Information at boundary of Lead/Water Shield");
+  analysisManager->CreateNtupleDColumn("EventID");
+  analysisManager->CreateNtupleDColumn("TrackID");
+  analysisManager->CreateNtupleDColumn("PDGCode");
+  analysisManager->CreateNtupleDColumn("KineticEnergy");
+  analysisManager->FinishNtuple();
+
+  analysisManager->CreateNtuple("AirNeutrons", "Neutron Information at boundary of Water Shield/Fridge Volume");
+  analysisManager->CreateNtupleDColumn("EventID");
+  analysisManager->CreateNtupleDColumn("TrackID");
+  analysisManager->CreateNtupleDColumn("PDGCode");
+  analysisManager->CreateNtupleDColumn("KineticEnergy");
+  analysisManager->FinishNtuple();
+
   G4cout << "Analysis Manager created." << G4endl;
 }
 

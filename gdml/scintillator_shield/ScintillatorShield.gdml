@@ -209,7 +209,7 @@
     </volume>
   </structure>
 
-  <setup name="Target" version="1.0">
+  <setup name="WorldVol" version="1.0">
     <world ref="World"/>
   </setup>
 </gdml>
