@@ -118,6 +118,14 @@
     <!--<box name="TargetSolid" lunit="mm" x="1500.0" y="200.0" z="200.0" /> -->
     <box name="WaterShieldSolid" lunit="mm" x="800.0" y="800.0" z="800.0" />
     <box name="LeadShieldSolid" lunit="mm" x="1000.0" y="1000.0" z="1000.0" />
+    <box name="NeutronPlaneSolid" lunit="mm" x="1002.0" y="1002.0" z="1002.0" />
+    <box name="NeutronPlaneSolid2" lunit="mm" x="1004.0" y="1004.0" z="1004.0" />
+
+    <subtraction name="NeutronPlaneCavity">
+      <first ref="NeutronPlaneSolid2"/>
+      <second ref="NeutronPlaneSolid"/>
+      <positionref ref="shieldSub" />
+    </subtraction>  
 
     <subtraction name="DetectorCavity">
       <first ref="AirSolid"/>
@@ -177,8 +185,13 @@
       <solidref ref="FullShieldCavity" />
     </volume> 
 
+    <volume name="NeutronPlaneLog">
+      <materialref ref="Vacuum" />
+      <solidref ref="NeutronPlaneCavity" />
+    </volume>
+
     <volume name="World" >
-      <materialref ref="Air" />
+      <materialref ref="Vacuum" />
       <solidref ref="WorldSolid" />
       
     <physvol name="ScintillatorVol" >
@@ -186,10 +199,10 @@
 	<positionref ref="scintPos" />
       </physvol>
 
-    <physvol name="SensorVol" >
+  <!--  <physvol name="SensorVol" >
   <volumeref ref="SensorLog" />
   <positionref ref="scintPos" />
-    </physvol>
+    </physvol> -->
 
       <physvol name="AirVol" >
   <volumeref ref="AirLog" />
@@ -205,6 +218,11 @@
 	<volumeref ref="FullShieldLog" />
 	<positionref ref="shieldPos" />
       </physvol>
+
+      <physvol name="NeutronPlaneVol" >
+  <volumeref ref="NeutronPlaneLog" />
+  <positionref ref="shieldPos" />
+    </physvol>
      
     </volume>
   </structure>

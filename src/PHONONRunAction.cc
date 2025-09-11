@@ -82,6 +82,9 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("PrimaryMomentumX");
   analysisManager->CreateNtupleDColumn("PrimaryMomentumY");
   analysisManager->CreateNtupleDColumn("PrimaryMomentumZ");
+  analysisManager->CreateNtupleDColumn("totalLi");
+  analysisManager->CreateNtupleDColumn("totalNb");
+  analysisManager->CreateNtupleDColumn("totalO");
   analysisManager->CreateNtupleDColumn("totalNR");
   analysisManager->CreateNtupleDColumn("totalER");
   analysisManager->FinishNtuple();
@@ -127,6 +130,9 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("TrackID");
   analysisManager->CreateNtupleDColumn("PDGCode");
   analysisManager->CreateNtupleDColumn("KineticEnergy");
+  analysisManager->CreateNtupleDColumn("PositionDirX");
+  analysisManager->CreateNtupleDColumn("PositionDirY");
+  analysisManager->CreateNtupleDColumn("PositionDirZ");
   analysisManager->FinishNtuple();
 
   analysisManager->CreateNtuple("AirNeutrons", "Neutron Information at boundary of Water Shield/Fridge Volume");
@@ -134,6 +140,19 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("TrackID");
   analysisManager->CreateNtupleDColumn("PDGCode");
   analysisManager->CreateNtupleDColumn("KineticEnergy");
+  analysisManager->CreateNtupleDColumn("PositionDirX");
+  analysisManager->CreateNtupleDColumn("PositionDirY");
+  analysisManager->CreateNtupleDColumn("PositionDirZ");
+  analysisManager->FinishNtuple();
+
+  analysisManager->CreateNtuple("DetectorNeutrons", "Neutron Information at boundary of Fridge/Detector Volume");
+  analysisManager->CreateNtupleDColumn("EventID");
+  analysisManager->CreateNtupleDColumn("TrackID");
+  analysisManager->CreateNtupleDColumn("PDGCode");
+  analysisManager->CreateNtupleDColumn("KineticEnergy");
+  analysisManager->CreateNtupleDColumn("PositionDirX");
+  analysisManager->CreateNtupleDColumn("PositionDirY");
+  analysisManager->CreateNtupleDColumn("PositionDirZ");
   analysisManager->FinishNtuple();
 
   G4cout << "Analysis Manager created." << G4endl;

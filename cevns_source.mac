@@ -1,0 +1,79 @@
+# Macro file for example B2
+# 
+# Can be run in batch, without graphic
+# or interactively: Idle> /control/execute run1.mac
+#
+# Change the default number of workers (in multi-threading mode) 
+#/run/numberOfThreads 4
+#
+/PHONON/det/setGDMLFile gdml/scintillator_shield/ScintillatorShield.gdml
+/PHONON/run/useHDF5 false
+#/PHONON/run/setOutputFile shielded_testfiletypesetting
+#/PHONON/run/setOutputFile shielded_testfiletypesetting_higherEprimary
+/PHONON/run/setOutputFile cevns_Nb_recoils.root
+
+# Initialize kernel
+/run/initialize
+#
+# Default kinematics: 
+# proton 3 GeV in direction (0.,0.,1.)
+# 1 event with tracking/verbose
+#
+#/tracking/verbose 1
+#/run/beamOn 1
+#
+# 1 event with printing hits
+#
+/tracking/verbose 0
+/hits/verbose 2
+#/run/beamOn 1
+#
+# set target and chamber material
+#
+#/B2/det/setTargetMaterial G4_WATER
+#/B2/det/setChamberMaterial G4_Ar
+#/run/beamOn 3
+# 
+# set a magnetic field and max allowed step length
+# 3 event with printing hits
+#
+#/globalField/verbose 1
+#/globalField/setValue 0.2 0 0 tesla
+#/B2/det/stepMax 1.0 mm
+#/gun/energy 0.3 GeV
+#/run/beamOn 3
+#
+# muon 300 MeV in the direction (0.,0.,1.)
+# 3 event with detailed printing
+#
+
+/g4cmp/producePhonons 0
+/g4cmp/produceCharges 0
+/g4cmp/maxLukePhonons 0
+#/g4cmp/sampleLuke 0.00001
+/g4cmp/phononBounces 1
+/g4cmp/minEPhonons 0.001 eV
+#/g4cmp/verbose 1
+
+/process/inactivate phononScattering
+/process/inactivate phononDownconversion
+
+#set up a niobium-93 recoil source
+/gps/particle ion
+/gps/ion 41 93 0 0
+
+/gps/ene/type Lin
+/gps/ene/min 0 keV
+/gps/ene/max 20 keV
+/gps/ene/gradient 0
+/gps/ene/intercept 0.0001
+/gps/pos/type Volume
+/gps/pos/shape Para
+/gps/pos/centre 0.0 0.0 0.0 m
+/gps/pos/halfx 0.3 m
+/gps/pos/halfy 0.3 m
+/gps/pos/halfz 0.3 m
+/gps/ang/type cos
+/gps/pos/confine ScintillatorVol
+
+/run/beamOn 50000

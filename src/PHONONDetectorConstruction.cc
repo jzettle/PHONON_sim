@@ -180,7 +180,7 @@ G4VPhysicalVolume* PHONONDetectorConstruction::DefineVolumes()
   G4PhysicalVolumeStore *physvolstore = G4PhysicalVolumeStore::GetInstance();
   fScintPhys = physvolstore->GetVolume("ScintillatorVol");
   fAirPhys = physvolstore->GetVolume("AirVol");
-  fSensorPhys = physvolstore->GetVolume("SensorVol");
+  //fSensorPhys = physvolstore->GetVolume("SensorVol");
 
   return worldPhys;
   
@@ -199,7 +199,7 @@ void PHONONDetectorConstruction::ConstructSDandField()
   G4LatticePhysical* NbPhysical = new G4LatticePhysical(NbLogical);
   NbPhysical->SetMillerOrientation(1,0,0);
   LM->RegisterLattice(fScintPhys, NbPhysical);
-  LM->RegisterLattice(fSensorPhys, NbPhysical);
+  //LM->RegisterLattice(fSensorPhys, NbPhysical);
 
   // Sensitive detectors
 
@@ -239,24 +239,24 @@ void PHONONDetectorConstruction::ConstructSDandField()
   //topSurfProp->AddScatteringProperties(anhCutoff, reflCutoff, anhCoeffs,
 					 //diffCoeffs, specCoeffs, GHz, GHz, GHz);
   AttachPhononSensor(topSurfProp);
-  
+  /*
   new G4CMPLogicalBorderSurface("SubstrateSensor", fScintPhys, fSensorPhys,
 				topSurfProp);
   new G4CMPLogicalBorderSurface("SensorSubstrate", fSensorPhys, fScintPhys,
 				topSurfProp);
-  
+  */
   wallSurfProp = new G4CMPSurfaceProperty("WallSurf", 0.0, 1.0, 0.0, 0.0,
 					    	        1.0, 1.0, 0.0, 0.0);
   new G4CMPLogicalBorderSurface("SubstrateBorder", fAirPhys, fScintPhys,
 				wallSurfProp);
   new G4CMPLogicalBorderSurface("BorderSubstrate", fScintPhys, fAirPhys,
 				wallSurfProp);
-  
+  /*
   new G4CMPLogicalBorderSurface("SubstrateBorder", fAirPhys, fSensorPhys,
 				wallSurfProp);
   new G4CMPLogicalBorderSurface("BorderSubstrate", fSensorPhys, fAirPhys,
 				wallSurfProp);
-  
+  */
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

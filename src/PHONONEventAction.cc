@@ -80,12 +80,13 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
   //set file type to HDF5 if required
   //analysisManager->SetDefaultFileType("root");
   //G4cout << "Using HDF5 output format." << G4endl;
-
+  
   G4TrajectoryContainer* trajectoryContainer = event->GetTrajectoryContainer();
   G4int n_trajectories = 0;
   if (trajectoryContainer) n_trajectories = trajectoryContainer->entries();
-  double primary_x = std::numeric_limits<double>::quiet_NaN(), primary_y = std::numeric_limits<double>::quiet_NaN(), primary_z = std::numeric_limits<double>::quiet_NaN();
+  //double primary_x = std::numeric_limits<double>::quiet_NaN(), primary_y = std::numeric_limits<double>::quiet_NaN(), primary_z = std::numeric_limits<double>::quiet_NaN();
   //grab position of primary from trajectory container
+  /*
   if (n_trajectories > 0) {
     G4Trajectory* primaryTraj = (G4Trajectory*)(*trajectoryContainer)[0];
     if (primaryTraj) {
@@ -95,10 +96,13 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
       primary_z = primaryPos.z();
     }
   }
-
+  */
+  
   //extract primary particle information (this is nicer than going through the trajectory container)
   // Note: This assumes there is at least one primary vertex and one primary particle.
+  double primary_x = std::numeric_limits<double>::quiet_NaN(), primary_y = std::numeric_limits<double>::quiet_NaN(), primary_z = std::numeric_limits<double>::quiet_NaN();
   G4PrimaryParticle* primaryParticle = event->GetPrimaryVertex()->GetPrimary(0);
+  G4PrimaryVertex* primaryVertex = event->GetPrimaryVertex(0);
 
   // periodic printing
   if ( eventID < 100 || eventID % 100 == 0) {
@@ -131,6 +135,9 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
 
   G4double totalNR = 0.0;
   G4double totalER = 0.0;
+  G4double totalNb = 0.0;
+  G4double totalLi = 0.0;
+  G4double totalO = 0.0;
 
   if (myHitsCollection) {
     for (unsigned int i = 0; i < myHitsCollection->entries(); ++i) {
@@ -151,6 +158,18 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
         {
           totalNR += hit->GetEdep();
         }         
+        if(hit->GetParticleName().find("Li") != std::string::npos) 
+        {
+          totalLi += hit->GetEdep();
+        }
+        if(hit->GetParticleName().find("Nb") != std::string::npos) 
+        {
+          totalNb += hit->GetEdep();
+        }
+        if(hit->GetParticleName().find("O") != std::string::npos) 
+        {
+          totalO += hit->GetEdep();
+        }
         // Fill the analysis ntuple
           analysisManager->FillNtupleDColumn(1, 0, eventID);
           analysisManager->FillNtupleDColumn(1, 1, hit->GetTrackID());
@@ -179,6 +198,12 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
     G4double kineticEnergy = primaryParticle->GetKineticEnergy();
     //G4ThreeVector position = primaryParticle->GetPosition();
     G4ThreeVector momentumDirection = primaryParticle->GetMomentumDirection();
+    if (primaryVertex) {
+      G4ThreeVector primaryPos = primaryVertex->GetPosition();
+      primary_x = primaryPos.x();
+      primary_y = primaryPos.y();
+      primary_z = primaryPos.z();
+    }
     analysisManager->FillNtupleDColumn(0, 0, eventID);
     analysisManager->FillNtupleDColumn(0, 1, trackID);
     analysisManager->FillNtupleDColumn(0, 2, pdgCode);
@@ -189,8 +214,11 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
     analysisManager->FillNtupleDColumn(0, 7, momentumDirection.x());
     analysisManager->FillNtupleDColumn(0, 8, momentumDirection.y());
     analysisManager->FillNtupleDColumn(0, 9, momentumDirection.z());
-    analysisManager->FillNtupleDColumn(0, 10, totalNR);
-    analysisManager->FillNtupleDColumn(0, 11, totalER);
+    analysisManager->FillNtupleDColumn(0, 10, totalNb);
+    analysisManager->FillNtupleDColumn(0, 11, totalLi);
+    analysisManager->FillNtupleDColumn(0, 12, totalO);
+    analysisManager->FillNtupleDColumn(0, 13, totalNR);
+    analysisManager->FillNtupleDColumn(0, 14, totalER);
     analysisManager->AddNtupleRow(0);
   }
 
