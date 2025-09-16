@@ -7,5 +7,5 @@ INSTANCE=$3
 #according to whichever thread N we are in. The 'sed' command replaces
 #the existing *.root file with *_N.root
 sed 's|setOutputFile \(.*\).root|setOutputFile '"${DIR}"'/\1_'"${INSTANCE}"'.root|' < ${MACRO} > ${MACRO}_${INSTANCE}
-./PHONON-build/PHONONBkgnd ${MACRO}_${INSTANCE} > $DIR/output_${INSTANCE}.txt
+./PHONON-build/PHONONBkgnd -m ${MACRO}_${INSTANCE} -s ${INSTANCE} > $DIR/output_${INSTANCE}.txt
 rm ${MACRO}_${INSTANCE}
