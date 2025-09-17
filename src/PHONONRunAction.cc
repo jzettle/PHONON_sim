@@ -133,6 +133,7 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("PositionDirX");
   analysisManager->CreateNtupleDColumn("PositionDirY");
   analysisManager->CreateNtupleDColumn("PositionDirZ");
+  analysisManager->CreateNtupleDColumn("PrimaryEnergy");
   analysisManager->FinishNtuple();
 
   analysisManager->CreateNtuple("AirNeutrons", "Neutron Information at boundary of Water Shield/Fridge Volume");
@@ -143,6 +144,7 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("PositionDirX");
   analysisManager->CreateNtupleDColumn("PositionDirY");
   analysisManager->CreateNtupleDColumn("PositionDirZ");
+  analysisManager->CreateNtupleDColumn("PrimaryEnergy");
   analysisManager->FinishNtuple();
 
   analysisManager->CreateNtuple("DetectorNeutrons", "Neutron Information at boundary of Fridge/Detector Volume");
@@ -153,6 +155,7 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("PositionDirX");
   analysisManager->CreateNtupleDColumn("PositionDirY");
   analysisManager->CreateNtupleDColumn("PositionDirZ");
+  analysisManager->CreateNtupleDColumn("PrimaryEnergy");
   analysisManager->FinishNtuple();
 
   G4cout << "Analysis Manager created." << G4endl;

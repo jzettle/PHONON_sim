@@ -58,13 +58,15 @@
 /process/inactivate phononScattering
 /process/inactivate phononDownconversion
 
+/PHONONEvent/offset 0
+
 #set up a niobium-93 recoil source
 /gps/particle ion
 /gps/ion 41 93 0 0
 
 /gps/ene/type Lin
 /gps/ene/min 0 keV
-/gps/ene/max 20 keV
+/gps/ene/max 150 keV
 /gps/ene/gradient 0
 /gps/ene/intercept 0.0001
 /gps/pos/type Volume
@@ -76,4 +78,4 @@
 /gps/ang/type cos
 /gps/pos/confine ScintillatorVol
 
-/run/beamOn 50000
+/run/beamOn 500000

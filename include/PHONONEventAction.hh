@@ -31,12 +31,15 @@
 #define PHONONEventAction_h 1
 
 #include "G4UserEventAction.hh"
+#include "PHONONEventMessenger.hh"
 
 #include "globals.hh"
 
 #include <fstream>
 
 /// Event action class
+
+class PHONONEventMessenger;
 
 class PHONONEventAction : public G4UserEventAction
 {
@@ -47,9 +50,15 @@ class PHONONEventAction : public G4UserEventAction
     virtual void  BeginOfEventAction(const G4Event* );
     virtual void    EndOfEventAction(const G4Event* );
 
+    void SetEventOffset(G4int offset);
+    int GetEventOffset() const;
+
   private:
     // Add any private members or methods if needed
     std::ofstream fOutputFile; // Output file for event information
+    G4int fEventOffset;        // Offset for event numbering
+    G4int fOffset;             // Offset initial setting
+    PHONONEventMessenger* fMessenger;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

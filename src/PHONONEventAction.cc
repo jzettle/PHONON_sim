@@ -28,6 +28,7 @@
 /// \brief Implementation of the B2EventAction class
 
 #include "PHONONEventAction.hh"
+#include "PHONONEventMessenger.hh"
 #include "PHONONScintSD.hh"
 #include "PHONONRunAction.hh"
 
@@ -49,17 +50,32 @@
 
 PHONONEventAction::PHONONEventAction()
 : G4UserEventAction()
-{}
+{ fMessenger = new PHONONEventMessenger(this); }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 PHONONEventAction::~PHONONEventAction()
-{}
+{ delete fMessenger; }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void PHONONEventAction::BeginOfEventAction(const G4Event*)
-{}
+void PHONONEventAction::SetEventOffset(G4int offset)
+{
+  fOffset = offset; 
+  G4cout << "Event offset set to " << fOffset << G4endl;
+}
+
+int PHONONEventAction::GetEventOffset() const
+{
+  return fOffset;
+}
+
+void PHONONEventAction::BeginOfEventAction(const G4Event* event)
+{
+  G4RunManager* runMan = G4RunManager::GetRunManager();
+  int totalEvents = runMan->GetNumberOfEventsToBeProcessed();
+  fEventOffset = totalEvents*fOffset; //avoids duplicating last event as event numbers are 0-N-1
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -138,6 +154,9 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
   G4double totalNb = 0.0;
   G4double totalLi = 0.0;
   G4double totalO = 0.0;
+
+  //alter event number based on offset
+  eventID += fEventOffset;
 
   if (myHitsCollection) {
     for (unsigned int i = 0; i < myHitsCollection->entries(); ++i) {

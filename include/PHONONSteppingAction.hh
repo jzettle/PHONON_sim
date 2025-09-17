@@ -2,6 +2,7 @@
 #define PHONONSteppingAction_h 1
 
 #include "globals.hh"
+#include "PHONONEventAction.hh"
 
 #include "G4UserSteppingAction.hh"
 

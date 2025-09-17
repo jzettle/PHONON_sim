@@ -11,6 +11,7 @@
 #/PHONON/run/setOutputFile shielded_testfiletypesetting
 #/PHONON/run/setOutputFile shielded_testfiletypesetting_higherEprimary
 /PHONON/run/setOutputFile neutron_transferfunction_planarsource.root
+#/PHONON/run/setOutputFile scrap.root
 
 # Initialize kernel
 /run/initialize
@@ -58,6 +59,8 @@
 /process/inactivate phononScattering
 /process/inactivate phononDownconversion
 
+/PHONONEvent/offset 0
+
 /gps/particle neutron
 #/gps/energy 0.03 eV
 #/gps/particle phononL
@@ -80,3 +83,4 @@
 #/gps/pos/confine NeutronPlaneVol
 
 /run/beamOn 750000
+#/run/beamOn 1000

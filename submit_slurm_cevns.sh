@@ -14,7 +14,7 @@
 #Call "date" at beginning and end just to get timestamps
 date
 
-MACROFILE=planar_neutron_source.mac
+MACROFILE=cevns_source.mac
 OUTPUT_DIR=/N/project/phonon/PHONON_Bkgnds/job_submission/multisim/${SLURM_JOB_ID}
 
 source /N/project/phonon/setup_phonon.sh
