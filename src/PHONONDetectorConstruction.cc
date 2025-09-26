@@ -24,8 +24,8 @@
 // ********************************************************************
 //
 //
-/// \file B2bDetectorConstruction.cc
-/// \brief Implementation of the B2bDetectorConstruction class
+/// \file PHONONDetectorConstruction.cc
+/// \brief Implementation of the PHONONDetectorConstruction class
  
 #include "PHONONDetectorConstruction.hh"
 #include "PHONONDetectorMessenger.hh"
@@ -74,9 +74,8 @@ G4ThreadLocal
 G4GlobalMagFieldMessenger* PHONONDetectorConstruction::fMagFieldMessenger = 0;
  
 PHONONDetectorConstruction::PHONONDetectorConstruction()
-:G4VUserDetectorConstruction(),
- fLogicTarget(NULL), fLogicChamber(NULL), 
- fPbShieldMaterial(NULL), fWaterShieldMaterial(NULL), topSurfProp(0),
+:G4VUserDetectorConstruction(), fLogicChamber(NULL), 
+ topSurfProp(0),
  fChamberMaterial(NULL), fStepLimit(NULL), 
  fCheckOverlaps(true)
 {
@@ -118,23 +117,6 @@ void PHONONDetectorConstruction::DefineMaterials()
 
   G4NistManager* nistManager = G4NistManager::Instance();
 
-  // Air defined using NIST Manager
-  nistManager->FindOrBuildMaterial("G4_AIR");
-
-  fVacuumMaterial = nistManager->FindOrBuildMaterial("G4_Galactic");
-  
-  // Lead defined using NIST Manager
-  fPbShieldMaterial = nistManager->FindOrBuildMaterial("G4_Pb");
-
-  fWaterShieldMaterial = nistManager->FindOrBuildMaterial("G4_WATER");
-
-
-  G4Element* elH = new G4Element("Hydrogen","H",1.,1.01*g/mole);
-  G4Element* elC = new G4Element("Carbon","C",6.,12.01*g/mole);
-  //double density = 0.874*g/cm3;
-  //fChamberMaterial = new G4Material("EJ301",0.874*g/cm3,2);
-  //fChamberMaterial->AddElement(elH, 303);
-  //fChamberMaterial->AddElement(elC, 250);
   G4Element* elLi  = new G4Element("Li","Li", 3., 6.941*g/mole);
   G4Element* elO   = new G4Element("O","O" , 8., 16.*g/mole);
   G4Element* elNb  = new G4Element("Nb","Nb", 41., 92.9064*g/mole);
@@ -154,8 +136,6 @@ void PHONONDetectorConstruction::DefineMaterials()
 
 G4VPhysicalVolume* PHONONDetectorConstruction::DefineVolumes()
 {
-  G4Material* air  = G4Material::GetMaterial("G4_AIR");
-
   // Sizes of the principal geometrical components (solids)
 
   G4double worldLength = 50*m; // World size
@@ -175,7 +155,7 @@ G4VPhysicalVolume* PHONONDetectorConstruction::DefineVolumes()
 
   G4LogicalVolumeStore *logvolstore = G4LogicalVolumeStore::GetInstance();
   fLogicChamber = logvolstore->GetVolume("ScintLog");
-  fSensorLogic = logvolstore->GetVolume("SensorLog");
+  //fSensorLogic = logvolstore->GetVolume("SensorLog");
 
   G4PhysicalVolumeStore *physvolstore = G4PhysicalVolumeStore::GetInstance();
   fScintPhys = physvolstore->GetVolume("ScintillatorVol");
@@ -209,16 +189,16 @@ void PHONONDetectorConstruction::ConstructSDandField()
   G4SDManager* SDman = G4SDManager::GetSDMpointer();
   SDman->AddNewDetector(aScintSD);
   fLogicChamber->SetSensitiveDetector(aScintSD);
-  //SetSensitiveDetector("ScintLog",  aScintSD, true);
+  //SetSensitiveDetector("ScintLog",  aScintSD);
   //SetSensitiveDetector(fLogicChamber,  aScintSD);
 
   if (!electrodeSensitivity)
     electrodeSensitivity = new PhononSensitivity("PhononElectrode");
   SDman->AddNewDetector(electrodeSensitivity);
-  //SetSensitiveDetector("ScintLog",  electrodeSensitivity, true);
+  //SetSensitiveDetector("ScintLog",  electrodeSensitivity);
   //SetSensitiveDetector(fSensorLogic,  electrodeSensitivity);
   //fLogicChamber->SetSensitiveDetector(electrodeSensitivity);
-  fSensorLogic->SetSensitiveDetector(electrodeSensitivity);
+  //fSensorLogic->SetSensitiveDetector(electrodeSensitivity);
 
   const G4double GHz = 1e9 * hertz; 
 
@@ -265,56 +245,6 @@ void PHONONDetectorConstruction::SetGDMLFile(G4String filename)
 {
   G4cout << "Setting GDML file to: " << filename << G4endl;
   fGDMLFile = filename;
-}
-
-void PHONONDetectorConstruction::SetTargetMaterial(G4String materialName)
-{
-  G4NistManager* nistManager = G4NistManager::Instance();
-
-  G4Material* pttoMaterial =
-              nistManager->FindOrBuildMaterial(materialName);
-  /*
-  if (fTargetMaterial != pttoMaterial) {
-     if ( pttoMaterial ) {
-        fTargetMaterial = pttoMaterial;
-        if (fLogicTarget) fLogicTarget->SetMaterial(fTargetMaterial);
-        G4cout
-          << G4endl 
-          << "----> The target is made of " << materialName << G4endl;
-     } else {
-        G4cout
-          << G4endl 
-          << "-->  WARNING from SetTargetMaterial : "
-          << materialName << " not found" << G4endl;
-     }
-  }
-     */
-}
- 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void PHONONDetectorConstruction::SetChamberMaterial(G4String materialName)
-{
-  G4NistManager* nistManager = G4NistManager::Instance();
-
-  G4Material* pttoMaterial =
-              nistManager->FindOrBuildMaterial(materialName);
-  /*
-  if (fChamberMaterial != pttoMaterial) {
-     if ( pttoMaterial ) {
-        fChamberMaterial = pttoMaterial;
-        if (fLogicChamber) fLogicChamber->SetMaterial(fChamberMaterial);
-        G4cout
-          << G4endl 
-          << "----> The chambers are made of " << materialName << G4endl;
-     } else {
-        G4cout
-          << G4endl
-          << "-->  WARNING from SetChamberMaterial : "
-          << materialName << " not found" << G4endl;
-     }
-  }
-     */
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

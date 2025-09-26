@@ -24,8 +24,8 @@
 // ********************************************************************
 //
 //
-/// \file B2EventAction.cc
-/// \brief Implementation of the B2EventAction class
+/// \file PHONONEventAction.cc
+/// \brief Implementation of the PHONONEventAction class
 
 #include "PHONONEventAction.hh"
 #include "PHONONEventMessenger.hh"
@@ -100,19 +100,6 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
   G4TrajectoryContainer* trajectoryContainer = event->GetTrajectoryContainer();
   G4int n_trajectories = 0;
   if (trajectoryContainer) n_trajectories = trajectoryContainer->entries();
-  //double primary_x = std::numeric_limits<double>::quiet_NaN(), primary_y = std::numeric_limits<double>::quiet_NaN(), primary_z = std::numeric_limits<double>::quiet_NaN();
-  //grab position of primary from trajectory container
-  /*
-  if (n_trajectories > 0) {
-    G4Trajectory* primaryTraj = (G4Trajectory*)(*trajectoryContainer)[0];
-    if (primaryTraj) {
-      G4ThreeVector primaryPos = primaryTraj->GetPoint(0)->GetPosition();
-      primary_x = primaryPos.x();
-      primary_y = primaryPos.y();
-      primary_z = primaryPos.z();
-    }
-  }
-  */
   
   //extract primary particle information (this is nicer than going through the trajectory container)
   // Note: This assumes there is at least one primary vertex and one primary particle.
@@ -163,16 +150,6 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
       PHONONScintHit* hit = (*myHitsCollection)[i];
       
       if (hit) {
-      /*
-        // Output hit information to the file
-          fOutputFile << "Event ID: " << eventID
-                      << ", Track ID: " << hit->GetTrackID()
-                      << ", PDG Code: " << hit->GetPDGCode()
-                      << ", Particle Name: " << hit->GetParticleName()
-                      //<< ", Chamber Number: " << hit->GetChamberNb()
-                      << ", Energy Deposit: " << hit->GetEdep()
-                      << ", Position: " << hit->GetPos() << G4endl;    
-        */
         if( (hit->GetParticleName().find("Li") != std::string::npos) || (hit->GetParticleName().find("Nb") != std::string::npos) || (hit->GetParticleName().find("O") != std::string::npos) ) 
         {
           totalNR += hit->GetEdep();
@@ -211,6 +188,82 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
     }
   }
   
+  //add phonon hit information to the output trees
+  collectionID = sdManager->GetCollectionID("PhononElectrode/G4CMPElectrodeHit");
+  if (collectionID < 0) {
+    G4cerr << "Phonon Hits collection not found, proceeding!" << G4endl;
+    return;
+  }
+
+  G4CMPElectrodeHitsCollection* phononHC = 0;
+  if (HCofEvent) {
+      phononHC = static_cast<G4CMPElectrodeHitsCollection*>(HCofEvent->GetHC(collectionID));
+  } 
+  if (phononHC) {
+    //totalPhonons = phononHC->entries();
+    for (unsigned int i = 0; i < phononHC->entries(); ++i) {
+      G4CMPElectrodeHit* hit = (*phononHC)[i];
+      if (hit) {
+          analysisManager->FillNtupleDColumn(3, 0, eventID);
+          analysisManager->FillNtupleDColumn(3, 1, hit->GetTrackID());
+          analysisManager->FillNtupleSColumn(3, 2, hit->GetParticleName());
+          analysisManager->FillNtupleDColumn(3, 3, hit->GetStartEnergy());
+          analysisManager->FillNtupleDColumn(3, 4, hit->GetStartPosition().x());
+          analysisManager->FillNtupleDColumn(3, 5, hit->GetStartPosition().y());
+          analysisManager->FillNtupleDColumn(3, 6, hit->GetStartPosition().z());
+          analysisManager->FillNtupleDColumn(3, 7, hit->GetStartTime());
+          analysisManager->FillNtupleDColumn(3, 8, hit->GetEnergyDeposit()/eV);
+          analysisManager->FillNtupleDColumn(3, 9, hit->GetWeight());
+          analysisManager->FillNtupleDColumn(3, 10, hit->GetFinalPosition().x());
+          analysisManager->FillNtupleDColumn(3, 11, hit->GetFinalPosition().y());
+          analysisManager->FillNtupleDColumn(3, 12, hit->GetFinalPosition().z());
+          analysisManager->FillNtupleDColumn(3, 13, hit->GetFinalTime());
+          analysisManager->AddNtupleRow(3);
+      }
+    }
+  }
+
+  //count number of phonons created in the event
+  int totalPhonons = 0;
+  G4TrajectoryContainer* trajContainer = event->GetTrajectoryContainer();
+  if (trajContainer) {
+    int nTraj = trajContainer->entries();
+    for (int i=0; i<nTraj; ++i) {
+      G4Trajectory* traj = (G4Trajectory*) ((*trajContainer)[i]);
+      int parentID = traj->GetParentID();
+      if (traj) {
+        if ((traj->GetParticleName() == "phononL" || traj->GetParticleName() == "phononTS" || traj->GetParticleName() == "phononTF") && parentID == 1) {
+          ++totalPhonons;
+          int trackID = traj->GetTrackID();
+          G4double kineticEnergy = traj->GetInitialKineticEnergy();
+          G4ThreeVector momentum = traj->GetInitialMomentum();
+          analysisManager->FillNtupleDColumn(2, 0, eventID);
+          analysisManager->FillNtupleDColumn(2, 1, trackID);
+          analysisManager->FillNtupleSColumn(2, 2, traj->GetParticleName());
+          analysisManager->FillNtupleDColumn(2, 3, kineticEnergy);
+          analysisManager->FillNtupleDColumn(2, 4, momentum.x());
+          analysisManager->FillNtupleDColumn(2, 5, momentum.y());
+          analysisManager->FillNtupleDColumn(2, 6, momentum.z());
+          analysisManager->AddNtupleRow(2);
+        }
+        if ((traj->GetParticleName() == "phononL" || traj->GetParticleName() == "phononTS" || traj->GetParticleName() == "phononTF") && parentID != 1) {
+          ++totalPhonons;
+          int trackID = traj->GetTrackID();
+          G4double kineticEnergy = traj->GetInitialKineticEnergy();
+          G4ThreeVector momentum = traj->GetInitialMomentum();
+          analysisManager->FillNtupleDColumn(7, 0, eventID);
+          analysisManager->FillNtupleDColumn(7, 1, trackID);
+          analysisManager->FillNtupleSColumn(7, 2, traj->GetParticleName());
+          analysisManager->FillNtupleDColumn(7, 3, kineticEnergy);
+          analysisManager->FillNtupleDColumn(7, 4, momentum.x());
+          analysisManager->FillNtupleDColumn(7, 5, momentum.y());
+          analysisManager->FillNtupleDColumn(7, 6, momentum.z());
+          analysisManager->AddNtupleRow(7);
+        }
+      }
+    }
+  }
+
   if (primaryParticle) {
     G4int trackID = primaryParticle->GetTrackID();
     G4int pdgCode = primaryParticle->GetPDGcode();
@@ -238,43 +291,9 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
     analysisManager->FillNtupleDColumn(0, 12, totalO);
     analysisManager->FillNtupleDColumn(0, 13, totalNR);
     analysisManager->FillNtupleDColumn(0, 14, totalER);
+    analysisManager->FillNtupleDColumn(0, 15, totalPhonons);
     analysisManager->AddNtupleRow(0);
   }
-
-  //add phonon hit information to the output trees
-  collectionID = sdManager->GetCollectionID("PhononElectrode/G4CMPElectrodeHit");
-  if (collectionID < 0) {
-    G4cerr << "Phonon Hits collection not found, proceeding!" << G4endl;
-    return;
-  }
-
-  G4CMPElectrodeHitsCollection* phononHC = 0;
-  if (HCofEvent) {
-      phononHC = static_cast<G4CMPElectrodeHitsCollection*>(HCofEvent->GetHC(collectionID));
-  } 
-  if (phononHC) {
-    for (unsigned int i = 0; i < phononHC->entries(); ++i) {
-      G4CMPElectrodeHit* hit = (*phononHC)[i];
-      if (hit) {
-          analysisManager->FillNtupleDColumn(2, 0, eventID);
-          analysisManager->FillNtupleDColumn(2, 1, hit->GetTrackID());
-          analysisManager->FillNtupleSColumn(2, 2, hit->GetParticleName());
-          analysisManager->FillNtupleDColumn(2, 3, hit->GetStartEnergy());
-          analysisManager->FillNtupleDColumn(2, 4, hit->GetStartPosition().x());
-          analysisManager->FillNtupleDColumn(2, 5, hit->GetStartPosition().y());
-          analysisManager->FillNtupleDColumn(2, 6, hit->GetStartPosition().z());
-          analysisManager->FillNtupleDColumn(2, 7, hit->GetStartTime());
-          analysisManager->FillNtupleDColumn(2, 8, hit->GetEnergyDeposit()/eV);
-          analysisManager->FillNtupleDColumn(2, 9, hit->GetWeight());
-          analysisManager->FillNtupleDColumn(2, 10, hit->GetFinalPosition().x());
-          analysisManager->FillNtupleDColumn(2, 11, hit->GetFinalPosition().y());
-          analysisManager->FillNtupleDColumn(2, 12, hit->GetFinalPosition().z());
-          analysisManager->FillNtupleDColumn(2, 13, hit->GetFinalTime());
-          analysisManager->AddNtupleRow(2);
-      }
-    }
-  }
-
 
 
   fOutputFile.close(); 

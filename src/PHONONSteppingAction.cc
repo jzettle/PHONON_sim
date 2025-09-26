@@ -60,33 +60,18 @@ void PHONONSteppingAction::UserSteppingAction(const G4Step* step)
             const G4Event* currentEvent = runManager->GetCurrentEvent();
             G4PrimaryParticle* primaryParticle = currentEvent->GetPrimaryVertex()->GetPrimary(0);
             double primaryEnergy = primaryParticle->GetKineticEnergy();
-            analysisManager->FillNtupleDColumn(3, 0, eventID);
-            analysisManager->FillNtupleDColumn(3, 1, trackID);
-            analysisManager->FillNtupleDColumn(3, 2, pdgCode);
-            analysisManager->FillNtupleDColumn(3, 3, kineticEnergy);
-            analysisManager->FillNtupleDColumn(3, 4, position_x);
-            analysisManager->FillNtupleDColumn(3, 5, position_y);
-            analysisManager->FillNtupleDColumn(3, 6, position_z);
-            analysisManager->FillNtupleDColumn(3, 7, primaryEnergy);
-            analysisManager->AddNtupleRow(3);
-        }
-        // Check if the particle is entering the "Fridge" volume from the "Water" volume
-        if((postVolumeName == "AirVol" && preVolumeName == "WaterShieldVol") && particle->GetParticleName() == "neutron") {
-            const G4Event* currentEvent = runManager->GetCurrentEvent();
-            G4PrimaryParticle* primaryParticle = currentEvent->GetPrimaryVertex()->GetPrimary(0);
-            double primaryEnergy = primaryParticle->GetKineticEnergy();
             analysisManager->FillNtupleDColumn(4, 0, eventID);
             analysisManager->FillNtupleDColumn(4, 1, trackID);
             analysisManager->FillNtupleDColumn(4, 2, pdgCode);
-            analysisManager->FillNtupleDColumn(4, 3, kineticEnergy); 
+            analysisManager->FillNtupleDColumn(4, 3, kineticEnergy);
             analysisManager->FillNtupleDColumn(4, 4, position_x);
             analysisManager->FillNtupleDColumn(4, 5, position_y);
             analysisManager->FillNtupleDColumn(4, 6, position_z);
             analysisManager->FillNtupleDColumn(4, 7, primaryEnergy);
             analysisManager->AddNtupleRow(4);
         }
-        // Check if the particle is entering the "LiNbO3" volume from the "Fridge" volume
-        if((postVolumeName == "ScintillatorVol" && preVolumeName == "AirVol") && particle->GetParticleName() == "neutron") {
+        // Check if the particle is entering the "Fridge" volume from the "Water" volume
+        if((postVolumeName == "AirVol" && preVolumeName == "WaterShieldVol") && particle->GetParticleName() == "neutron") {
             const G4Event* currentEvent = runManager->GetCurrentEvent();
             G4PrimaryParticle* primaryParticle = currentEvent->GetPrimaryVertex()->GetPrimary(0);
             double primaryEnergy = primaryParticle->GetKineticEnergy();
@@ -99,6 +84,21 @@ void PHONONSteppingAction::UserSteppingAction(const G4Step* step)
             analysisManager->FillNtupleDColumn(5, 6, position_z);
             analysisManager->FillNtupleDColumn(5, 7, primaryEnergy);
             analysisManager->AddNtupleRow(5);
+        }
+        // Check if the particle is entering the "LiNbO3" volume from the "Fridge" volume
+        if((postVolumeName == "ScintillatorVol" && preVolumeName == "AirVol") && particle->GetParticleName() == "neutron") {
+            const G4Event* currentEvent = runManager->GetCurrentEvent();
+            G4PrimaryParticle* primaryParticle = currentEvent->GetPrimaryVertex()->GetPrimary(0);
+            double primaryEnergy = primaryParticle->GetKineticEnergy();
+            analysisManager->FillNtupleDColumn(6, 0, eventID);
+            analysisManager->FillNtupleDColumn(6, 1, trackID);
+            analysisManager->FillNtupleDColumn(6, 2, pdgCode);
+            analysisManager->FillNtupleDColumn(6, 3, kineticEnergy); 
+            analysisManager->FillNtupleDColumn(6, 4, position_x);
+            analysisManager->FillNtupleDColumn(6, 5, position_y);
+            analysisManager->FillNtupleDColumn(6, 6, position_z);
+            analysisManager->FillNtupleDColumn(6, 7, primaryEnergy);
+            analysisManager->AddNtupleRow(6);
         }
     }
 }

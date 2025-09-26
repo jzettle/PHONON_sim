@@ -31,6 +31,7 @@
 #include "PHONONPrimaryGeneratorAction.hh"
 #include "PHONONRunAction.hh"
 #include "PHONONEventAction.hh"
+#include "PHONONTrackingAction.hh"
 #include "PHONONSteppingAction.hh"
 #include "G4CMPStackingAction.hh"
 
@@ -60,6 +61,7 @@ void PHONONActionInitialization::Build() const
   SetUserAction(new G4CMPStackingAction);
   SetUserAction(new PHONONRunAction);
   SetUserAction(eventAction);
+  SetUserAction(new PHONONTrackingAction());
   SetUserAction(new PHONONSteppingAction(eventAction));
 }  
 

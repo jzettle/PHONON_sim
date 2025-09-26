@@ -87,6 +87,7 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("totalO");
   analysisManager->CreateNtupleDColumn("totalNR");
   analysisManager->CreateNtupleDColumn("totalER");
+  analysisManager->CreateNtupleDColumn("totalPhonons");
   analysisManager->FinishNtuple();
 
   analysisManager->CreateNtuple("Hits", "Hit Data");
@@ -106,6 +107,16 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("MomentumDirectionY");
   analysisManager->CreateNtupleDColumn("MomentumDirectionZ");
   analysisManager->CreateNtupleDColumn("HitTime");
+  analysisManager->FinishNtuple();
+
+  analysisManager->CreateNtuple("PrimaryPhononTracks", "Phonon Track Data");
+  analysisManager->CreateNtupleDColumn("EventID");
+  analysisManager->CreateNtupleDColumn("TrackID");
+  analysisManager->CreateNtupleSColumn("ParticleName");
+  analysisManager->CreateNtupleDColumn("StartEnergy");
+  analysisManager->CreateNtupleDColumn("StartMomX");
+  analysisManager->CreateNtupleDColumn("StartMomY");
+  analysisManager->CreateNtupleDColumn("StartMomZ");
   analysisManager->FinishNtuple();
 
   analysisManager->CreateNtuple("PhononHits", "Phonon Hit Data");
@@ -156,6 +167,16 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("PositionDirY");
   analysisManager->CreateNtupleDColumn("PositionDirZ");
   analysisManager->CreateNtupleDColumn("PrimaryEnergy");
+  analysisManager->FinishNtuple();
+
+  analysisManager->CreateNtuple("SecondaryPhononTracks", "Phonon Track Data");
+  analysisManager->CreateNtupleDColumn("EventID");
+  analysisManager->CreateNtupleDColumn("TrackID");
+  analysisManager->CreateNtupleSColumn("ParticleName");
+  analysisManager->CreateNtupleDColumn("StartEnergy");
+  analysisManager->CreateNtupleDColumn("StartMomX");
+  analysisManager->CreateNtupleDColumn("StartMomY");
+  analysisManager->CreateNtupleDColumn("StartMomZ");
   analysisManager->FinishNtuple();
 
   G4cout << "Analysis Manager created." << G4endl;
