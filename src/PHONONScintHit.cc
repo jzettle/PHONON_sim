@@ -51,7 +51,8 @@ PHONONScintHit::PHONONScintHit()
    fPos(G4ThreeVector()),
    fMomentum(G4ThreeVector()),
    fMomentumDirection(G4ThreeVector()),
-   fTime(-1000.)
+   fTime(-1000.),
+   fCopyNumber(-1)
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -73,6 +74,7 @@ PHONONScintHit::PHONONScintHit(const PHONONScintHit& right)
   fMomentum = right.fMomentum;
   fMomentumDirection = right.fMomentumDirection;
   fTime      = right.fTime;
+  fCopyNumber = right.fCopyNumber;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -89,6 +91,7 @@ const PHONONScintHit& PHONONScintHit::operator=(const PHONONScintHit& right)
   fMomentum = right.fMomentum;
   fMomentumDirection = right.fMomentumDirection;
   fTime      = right.fTime;
+  fCopyNumber = right.fCopyNumber;
 
   return *this;
 }

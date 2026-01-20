@@ -10,9 +10,10 @@
 #include "G4ThreeVector.hh"
 #include "G4SystemOfUnits.hh"
 
-PHONONSteppingAction::PHONONSteppingAction(PHONONEventAction *eventAction)
+PHONONSteppingAction::PHONONSteppingAction(PHONONEventAction *eventAction, PHONONDetectorConstruction *detectorConstruction)
 : G4UserSteppingAction(),
-  fEventAction(eventAction)
+  fEventAction(eventAction),
+  fDetectorConstruction(detectorConstruction)
 {}
 PHONONSteppingAction::~PHONONSteppingAction(){}
 
@@ -46,6 +47,7 @@ void PHONONSteppingAction::UserSteppingAction(const G4Step* step)
     //attempt to get event offset from event action
     int offset = 0;
     offset = fEventAction->GetEventOffset();
+    G4String geometryType = fDetectorConstruction->GetGeometryType();
 
     int totalEvents = runManager->GetNumberOfEventsToBeProcessed();
     eventID += totalEvents*offset;
@@ -85,8 +87,14 @@ void PHONONSteppingAction::UserSteppingAction(const G4Step* step)
             analysisManager->FillNtupleDColumn(5, 7, primaryEnergy);
             analysisManager->AddNtupleRow(5);
         }
+        G4String checkVolume = "";
+        if(geometryType == "scintillator") {
+            checkVolume = "ScintillatorVol";
+        }
+        else
+            checkVolume = "SubstrateVol";
         // Check if the particle is entering the "LiNbO3" volume from the "Fridge" volume
-        if((postVolumeName == "ScintillatorVol" && preVolumeName == "AirVol") && particle->GetParticleName() == "neutron") {
+        if((postVolumeName.find(checkVolume) != std::string::npos && preVolumeName == "AirVol") && particle->GetParticleName() == "neutron") {
             const G4Event* currentEvent = runManager->GetCurrentEvent();
             G4PrimaryParticle* primaryParticle = currentEvent->GetPrimaryVertex()->GetPrimary(0);
             double primaryEnergy = primaryParticle->GetKineticEnergy();
@@ -100,5 +108,20 @@ void PHONONSteppingAction::UserSteppingAction(const G4Step* step)
             analysisManager->FillNtupleDColumn(6, 7, primaryEnergy);
             analysisManager->AddNtupleRow(6);
         }
+        if((postVolumeName.find(checkVolume) != std::string::npos && preVolumeName == "AirVol") && particle->GetParticleName() == "gamma") {
+            const G4Event* currentEvent = runManager->GetCurrentEvent();
+            G4PrimaryParticle* primaryParticle = currentEvent->GetPrimaryVertex()->GetPrimary(0);
+            double primaryEnergy = primaryParticle->GetKineticEnergy();
+            analysisManager->FillNtupleDColumn(8, 0, eventID);
+            analysisManager->FillNtupleDColumn(8, 1, trackID);
+            analysisManager->FillNtupleDColumn(8, 2, pdgCode);
+            analysisManager->FillNtupleDColumn(8, 3, kineticEnergy); 
+            analysisManager->FillNtupleDColumn(8, 4, position_x);
+            analysisManager->FillNtupleDColumn(8, 5, position_y);
+            analysisManager->FillNtupleDColumn(8, 6, position_z);
+            analysisManager->FillNtupleDColumn(8, 7, primaryEnergy);
+            analysisManager->AddNtupleRow(8);
+        }
     }
 }
+

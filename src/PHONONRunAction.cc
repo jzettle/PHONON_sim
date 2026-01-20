@@ -107,6 +107,7 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("MomentumDirectionY");
   analysisManager->CreateNtupleDColumn("MomentumDirectionZ");
   analysisManager->CreateNtupleDColumn("HitTime");
+  analysisManager->CreateNtupleDColumn("CopyNumber");
   analysisManager->FinishNtuple();
 
   analysisManager->CreateNtuple("PrimaryPhononTracks", "Phonon Track Data");
@@ -117,6 +118,8 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("StartMomX");
   analysisManager->CreateNtupleDColumn("StartMomY");
   analysisManager->CreateNtupleDColumn("StartMomZ");
+  analysisManager->CreateNtupleSColumn("CreatorProcess");
+  analysisManager->CreateNtupleDColumn("TrackWeight");
   analysisManager->FinishNtuple();
 
   analysisManager->CreateNtuple("PhononHits", "Phonon Hit Data");
@@ -177,6 +180,19 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("StartMomX");
   analysisManager->CreateNtupleDColumn("StartMomY");
   analysisManager->CreateNtupleDColumn("StartMomZ");
+  analysisManager->CreateNtupleSColumn("CreatorProcess");
+  analysisManager->CreateNtupleDColumn("TrackWeight");
+  analysisManager->FinishNtuple();
+
+  analysisManager->CreateNtuple("DetectorGammas", "Gamma Information at boundary of Fridge/Detector Volume");
+  analysisManager->CreateNtupleDColumn("EventID");
+  analysisManager->CreateNtupleDColumn("TrackID");
+  analysisManager->CreateNtupleDColumn("PDGCode");
+  analysisManager->CreateNtupleDColumn("KineticEnergy");
+  analysisManager->CreateNtupleDColumn("PositionDirX");
+  analysisManager->CreateNtupleDColumn("PositionDirY");
+  analysisManager->CreateNtupleDColumn("PositionDirZ");
+  analysisManager->CreateNtupleDColumn("PrimaryEnergy");
   analysisManager->FinishNtuple();
 
   G4cout << "Analysis Manager created." << G4endl;

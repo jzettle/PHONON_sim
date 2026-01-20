@@ -6,7 +6,7 @@
 # Change the default number of workers (in multi-threading mode) 
 #/run/numberOfThreads 4
 #
-/PHONON/det/setGDMLFile gdml/scintillator_shield/ScintillatorShield.gdml
+/PHONON/det/setGDMLFile gdml/detector_shield/SubstrateShield.gdml
 /PHONON/run/useHDF5 false
 #/PHONON/run/setOutputFile shielded_testfiletypesetting
 #/PHONON/run/setOutputFile shielded_testfiletypesetting_higherEprimary
@@ -48,8 +48,8 @@
 # 3 event with detailed printing
 #
 
-/g4cmp/producePhonons 0
-/g4cmp/produceCharges 0
+/g4cmp/producePhonons 0.001
+/g4cmp/produceCharges 0.001
 /g4cmp/maxLukePhonons 0
 #/g4cmp/sampleLuke 0.00001
 /g4cmp/phononBounces 1
@@ -69,9 +69,9 @@
 #/gps/number 1
 /gps/ene/type Lin
 /gps/ene/min 0.0 MeV
-/gps/ene/max 200.0 MeV
+/gps/ene/max 20.0 MeV
 /gps/ene/gradient 0.0
-/gps/ene/intercept 0.001
+/gps/ene/intercept 0.1
 /gps/pos/type Plane
 /gps/pos/shape Square
 /gps/pos/centre -0.51 0.0 0.0 m
@@ -82,5 +82,5 @@
 /gps/ang/type cos
 #/gps/pos/confine NeutronPlaneVol
 
-/run/beamOn 750000
-#/run/beamOn 1000
+/run/beamOn 1000000
+#/run/beamOn 10000

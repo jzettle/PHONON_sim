@@ -63,6 +63,8 @@ class PHONONDetectorMessenger: public G4UImessenger
 
     G4UIcmdWithAString*      fGDMLFileCmd;
 
+    G4UIcmdWithAString*      fTypeCmd;
+
     G4UIcmdWithADoubleAndUnit* fStepMaxCmd;
 };
 

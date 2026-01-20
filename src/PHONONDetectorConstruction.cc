@@ -74,7 +74,7 @@ G4ThreadLocal
 G4GlobalMagFieldMessenger* PHONONDetectorConstruction::fMagFieldMessenger = 0;
  
 PHONONDetectorConstruction::PHONONDetectorConstruction()
-:G4VUserDetectorConstruction(), fLogicChamber(NULL), 
+:G4VUserDetectorConstruction(), fLogicChamber(NULL),
  topSurfProp(0),
  fChamberMaterial(NULL), fStepLimit(NULL), 
  fCheckOverlaps(true)
@@ -154,11 +154,20 @@ G4VPhysicalVolume* PHONONDetectorConstruction::DefineVolumes()
   G4VPhysicalVolume* worldPhys = parser.GetWorldVolume();
 
   G4LogicalVolumeStore *logvolstore = G4LogicalVolumeStore::GetInstance();
-  fLogicChamber = logvolstore->GetVolume("ScintLog");
+  G4LogicalVolume* AirLog = logvolstore->GetVolume("AirLog");
+  //by default load substrate geometry
+  if(fGeometryType=="scintillator")
+    fLogicChamber = logvolstore->GetVolume("ScintLog");
+  else
+    fLogicChamber = logvolstore->GetVolume("SubLog");
+
   //fSensorLogic = logvolstore->GetVolume("SensorLog");
 
   G4PhysicalVolumeStore *physvolstore = G4PhysicalVolumeStore::GetInstance();
-  fScintPhys = physvolstore->GetVolume("ScintillatorVol");
+  if(fGeometryType=="scintillator")
+    fScintPhys = physvolstore->GetVolume("ScintillatorVol");
+  else
+    fScintPhys = physvolstore->GetVolume("SubstrateVol5");
   fAirPhys = physvolstore->GetVolume("AirVol");
   //fSensorPhys = physvolstore->GetVolume("SensorVol");
 
@@ -173,7 +182,7 @@ void PHONONDetectorConstruction::ConstructSDandField()
 
   G4LatticeManager* LM = G4LatticeManager::GetLatticeManager();
   //G4LatticeLogical* GeLogical = LM->LoadLattice(fChamberMaterial, "Ge");
-  G4LatticeLogical* NbLogical = LM->LoadLattice(fChamberMaterial, "LiNbO3");
+  G4LatticeLogical* NbLogical = LM->LoadLattice(fChamberMaterial, "LiNbO3_tetra");
 
   // G4LatticePhysical assigns G4LatticeLogical a physical orientation
   G4LatticePhysical* NbPhysical = new G4LatticePhysical(NbLogical);
@@ -196,6 +205,7 @@ void PHONONDetectorConstruction::ConstructSDandField()
     electrodeSensitivity = new PhononSensitivity("PhononElectrode");
   SDman->AddNewDetector(electrodeSensitivity);
   //SetSensitiveDetector("ScintLog",  electrodeSensitivity);
+
   //SetSensitiveDetector(fSensorLogic,  electrodeSensitivity);
   //fLogicChamber->SetSensitiveDetector(electrodeSensitivity);
   //fSensorLogic->SetSensitiveDetector(electrodeSensitivity);
@@ -245,6 +255,17 @@ void PHONONDetectorConstruction::SetGDMLFile(G4String filename)
 {
   G4cout << "Setting GDML file to: " << filename << G4endl;
   fGDMLFile = filename;
+}
+
+void PHONONDetectorConstruction::SetGeometryType(G4String type)
+{
+  G4cout << "Setting geometry type to: " << type << G4endl;
+  fGeometryType = type;
+}
+
+G4String PHONONDetectorConstruction::GetGeometryType() const
+{
+  return fGeometryType;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

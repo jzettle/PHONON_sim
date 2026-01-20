@@ -33,6 +33,9 @@
 #include "PHONONEventAction.hh"
 #include "PHONONTrackingAction.hh"
 #include "PHONONSteppingAction.hh"
+#include "PHONONStackingAction.hh"
+#include "PHONONDetectorConstruction.hh"
+#include "G4RunManager.hh"
 #include "G4CMPStackingAction.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -57,12 +60,14 @@ void PHONONActionInitialization::BuildForMaster() const
 void PHONONActionInitialization::Build() const
 {
   PHONONEventAction* eventAction = new PHONONEventAction();
+  PHONONDetectorConstruction* detectorConstruction = new PHONONDetectorConstruction();
   SetUserAction(new PHONONPrimaryGeneratorAction);
   SetUserAction(new G4CMPStackingAction);
+  SetUserAction(new PHONONStackingAction(eventAction));
   SetUserAction(new PHONONRunAction);
   SetUserAction(eventAction);
   SetUserAction(new PHONONTrackingAction());
-  SetUserAction(new PHONONSteppingAction(eventAction));
+  SetUserAction(new PHONONSteppingAction(eventAction, detectorConstruction));
 }  
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

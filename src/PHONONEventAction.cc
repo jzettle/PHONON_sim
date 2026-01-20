@@ -166,6 +166,10 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
         {
           totalO += hit->GetEdep();
         }
+        if (hit->GetParticleName() == "gamma" || hit->GetParticleName() == "e-" || hit->GetParticleName() == "e+") 
+        {
+          totalER += hit->GetEdep();
+        }
         // Fill the analysis ntuple
           analysisManager->FillNtupleDColumn(1, 0, eventID);
           analysisManager->FillNtupleDColumn(1, 1, hit->GetTrackID());
@@ -183,6 +187,7 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
           analysisManager->FillNtupleDColumn(1, 13, hit->GetMomentumDirection().y());
           analysisManager->FillNtupleDColumn(1, 14, hit->GetMomentumDirection().z());
           analysisManager->FillNtupleDColumn(1, 15, hit->GetTime());
+          analysisManager->FillNtupleDColumn(1, 16, hit->GetCopyNumber());
           analysisManager->AddNtupleRow(1);
         }
     }
@@ -234,31 +239,9 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
       if (traj) {
         if ((traj->GetParticleName() == "phononL" || traj->GetParticleName() == "phononTS" || traj->GetParticleName() == "phononTF") && parentID == 1) {
           ++totalPhonons;
-          int trackID = traj->GetTrackID();
-          G4double kineticEnergy = traj->GetInitialKineticEnergy();
-          G4ThreeVector momentum = traj->GetInitialMomentum();
-          analysisManager->FillNtupleDColumn(2, 0, eventID);
-          analysisManager->FillNtupleDColumn(2, 1, trackID);
-          analysisManager->FillNtupleSColumn(2, 2, traj->GetParticleName());
-          analysisManager->FillNtupleDColumn(2, 3, kineticEnergy);
-          analysisManager->FillNtupleDColumn(2, 4, momentum.x());
-          analysisManager->FillNtupleDColumn(2, 5, momentum.y());
-          analysisManager->FillNtupleDColumn(2, 6, momentum.z());
-          analysisManager->AddNtupleRow(2);
         }
         if ((traj->GetParticleName() == "phononL" || traj->GetParticleName() == "phononTS" || traj->GetParticleName() == "phononTF") && parentID != 1) {
           ++totalPhonons;
-          int trackID = traj->GetTrackID();
-          G4double kineticEnergy = traj->GetInitialKineticEnergy();
-          G4ThreeVector momentum = traj->GetInitialMomentum();
-          analysisManager->FillNtupleDColumn(7, 0, eventID);
-          analysisManager->FillNtupleDColumn(7, 1, trackID);
-          analysisManager->FillNtupleSColumn(7, 2, traj->GetParticleName());
-          analysisManager->FillNtupleDColumn(7, 3, kineticEnergy);
-          analysisManager->FillNtupleDColumn(7, 4, momentum.x());
-          analysisManager->FillNtupleDColumn(7, 5, momentum.y());
-          analysisManager->FillNtupleDColumn(7, 6, momentum.z());
-          analysisManager->AddNtupleRow(7);
         }
       }
     }

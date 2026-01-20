@@ -7,8 +7,8 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=jczettle@iu.edu 
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=16
-#SBATCH --time=06:00:00
+#SBATCH --ntasks-per-node=40
+#SBATCH --time=12:00:00
 #SBATCH -A r00253
 
 #Call "date" at beginning and end just to get timestamps
@@ -33,7 +33,7 @@ mkdir -p ${OUTPUT_DIR}       #this is where all output will go
 #  > ${OUTPUT_DIR}/gitstatus.txt #document the code and any uncommited changes
 
 #off we go
-seq -w 0 15 | parallel bash run_slurm.sh ${MACROFILE} ${OUTPUT_DIR} {}
+seq -w 0 39 | parallel bash run_slurm.sh ${MACROFILE} ${OUTPUT_DIR} {}
 
 #add the root files together for this node.
 #cd ${OUTPUT_DIR}
