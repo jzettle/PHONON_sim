@@ -82,8 +82,12 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("PrimaryMomentumX");
   analysisManager->CreateNtupleDColumn("PrimaryMomentumY");
   analysisManager->CreateNtupleDColumn("PrimaryMomentumZ");
+  analysisManager->CreateNtupleDColumn("totalLi");
+  analysisManager->CreateNtupleDColumn("totalNb");
+  analysisManager->CreateNtupleDColumn("totalO");
   analysisManager->CreateNtupleDColumn("totalNR");
   analysisManager->CreateNtupleDColumn("totalER");
+  analysisManager->CreateNtupleDColumn("totalPhonons");
   analysisManager->FinishNtuple();
 
   analysisManager->CreateNtuple("Hits", "Hit Data");
@@ -103,7 +107,94 @@ void PHONONRunAction::BeginOfRunAction(const G4Run*)
   analysisManager->CreateNtupleDColumn("MomentumDirectionY");
   analysisManager->CreateNtupleDColumn("MomentumDirectionZ");
   analysisManager->CreateNtupleDColumn("HitTime");
+  analysisManager->CreateNtupleDColumn("CopyNumber");
   analysisManager->FinishNtuple();
+
+  analysisManager->CreateNtuple("PrimaryPhononTracks", "Phonon Track Data");
+  analysisManager->CreateNtupleDColumn("EventID");
+  analysisManager->CreateNtupleDColumn("TrackID");
+  analysisManager->CreateNtupleSColumn("ParticleName");
+  analysisManager->CreateNtupleDColumn("StartEnergy");
+  analysisManager->CreateNtupleDColumn("StartMomX");
+  analysisManager->CreateNtupleDColumn("StartMomY");
+  analysisManager->CreateNtupleDColumn("StartMomZ");
+  analysisManager->CreateNtupleSColumn("CreatorProcess");
+  analysisManager->CreateNtupleDColumn("TrackWeight");
+  analysisManager->FinishNtuple();
+
+  analysisManager->CreateNtuple("PhononHits", "Phonon Hit Data");
+  analysisManager->CreateNtupleDColumn("EventID");
+  analysisManager->CreateNtupleDColumn("TrackID");
+  analysisManager->CreateNtupleSColumn("ParticleName");
+  analysisManager->CreateNtupleDColumn("StartEnergy");
+  analysisManager->CreateNtupleDColumn("StartPosX");
+  analysisManager->CreateNtupleDColumn("StartPosY");
+  analysisManager->CreateNtupleDColumn("StartPosZ");
+  analysisManager->CreateNtupleDColumn("StartTime");
+  analysisManager->CreateNtupleDColumn("Edep");
+  analysisManager->CreateNtupleDColumn("TrackWeight");
+  analysisManager->CreateNtupleDColumn("EndPosX");
+  analysisManager->CreateNtupleDColumn("EndPosY");
+  analysisManager->CreateNtupleDColumn("EndPosZ");
+  analysisManager->CreateNtupleDColumn("EndTime");
+  analysisManager->FinishNtuple();
+
+  analysisManager->CreateNtuple("WaterNeutrons", "Neutron Information at boundary of Lead/Water Shield");
+  analysisManager->CreateNtupleDColumn("EventID");
+  analysisManager->CreateNtupleDColumn("TrackID");
+  analysisManager->CreateNtupleDColumn("PDGCode");
+  analysisManager->CreateNtupleDColumn("KineticEnergy");
+  analysisManager->CreateNtupleDColumn("PositionDirX");
+  analysisManager->CreateNtupleDColumn("PositionDirY");
+  analysisManager->CreateNtupleDColumn("PositionDirZ");
+  analysisManager->CreateNtupleDColumn("PrimaryEnergy");
+  analysisManager->FinishNtuple();
+
+  analysisManager->CreateNtuple("AirNeutrons", "Neutron Information at boundary of Water Shield/Fridge Volume");
+  analysisManager->CreateNtupleDColumn("EventID");
+  analysisManager->CreateNtupleDColumn("TrackID");
+  analysisManager->CreateNtupleDColumn("PDGCode");
+  analysisManager->CreateNtupleDColumn("KineticEnergy");
+  analysisManager->CreateNtupleDColumn("PositionDirX");
+  analysisManager->CreateNtupleDColumn("PositionDirY");
+  analysisManager->CreateNtupleDColumn("PositionDirZ");
+  analysisManager->CreateNtupleDColumn("PrimaryEnergy");
+  analysisManager->FinishNtuple();
+
+  analysisManager->CreateNtuple("DetectorNeutrons", "Neutron Information at boundary of Fridge/Detector Volume");
+  analysisManager->CreateNtupleDColumn("EventID");
+  analysisManager->CreateNtupleDColumn("TrackID");
+  analysisManager->CreateNtupleDColumn("PDGCode");
+  analysisManager->CreateNtupleDColumn("KineticEnergy");
+  analysisManager->CreateNtupleDColumn("PositionDirX");
+  analysisManager->CreateNtupleDColumn("PositionDirY");
+  analysisManager->CreateNtupleDColumn("PositionDirZ");
+  analysisManager->CreateNtupleDColumn("PrimaryEnergy");
+  analysisManager->FinishNtuple();
+
+  analysisManager->CreateNtuple("SecondaryPhononTracks", "Phonon Track Data");
+  analysisManager->CreateNtupleDColumn("EventID");
+  analysisManager->CreateNtupleDColumn("TrackID");
+  analysisManager->CreateNtupleSColumn("ParticleName");
+  analysisManager->CreateNtupleDColumn("StartEnergy");
+  analysisManager->CreateNtupleDColumn("StartMomX");
+  analysisManager->CreateNtupleDColumn("StartMomY");
+  analysisManager->CreateNtupleDColumn("StartMomZ");
+  analysisManager->CreateNtupleSColumn("CreatorProcess");
+  analysisManager->CreateNtupleDColumn("TrackWeight");
+  analysisManager->FinishNtuple();
+
+  analysisManager->CreateNtuple("DetectorGammas", "Gamma Information at boundary of Fridge/Detector Volume");
+  analysisManager->CreateNtupleDColumn("EventID");
+  analysisManager->CreateNtupleDColumn("TrackID");
+  analysisManager->CreateNtupleDColumn("PDGCode");
+  analysisManager->CreateNtupleDColumn("KineticEnergy");
+  analysisManager->CreateNtupleDColumn("PositionDirX");
+  analysisManager->CreateNtupleDColumn("PositionDirY");
+  analysisManager->CreateNtupleDColumn("PositionDirZ");
+  analysisManager->CreateNtupleDColumn("PrimaryEnergy");
+  analysisManager->FinishNtuple();
+
   G4cout << "Analysis Manager created." << G4endl;
 }
 

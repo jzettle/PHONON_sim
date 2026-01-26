@@ -46,7 +46,7 @@
 #include "G4VisExecutive.hh"
 #include "G4UIExecutive.hh"
 
-#include <time.h>
+#include <chrono>
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -59,14 +59,26 @@ int main(int argc,char** argv)
     ui = new G4UIExecutive(argc, argv);
   }
 
-  G4int seed = time(0); // returns time in seconds as an int
-  time_t start_time = seed;
+  G4String macro = "";
+  auto epoch = std::chrono::system_clock::now().time_since_epoch();
+  long long seed = std::chrono::duration_cast<std::chrono::milliseconds>(epoch).count();
+  G4int seed_offset = 0;
 
   // Optionally: choose a different Random engine...
   // G4Random::setTheEngine(new CLHEP::MTwistEngine);
 
+  for(G4int i = 1; i < argc; i = i + 2)
+  {
+    if(G4String(argv[i]) == "-m")
+      macro = argv[i+1];
+    if(G4String(argv[i]) == "-s")
+      seed_offset = atoi(argv[i+1]);
+  }
+  seed += seed_offset;
   G4Random::setTheEngine(new CLHEP::RanecuEngine);
   G4Random::setTheSeed(seed);
+
+  G4cout << "The seed is: " << seed << G4endl;
   
   // Construct the default run manager
   //
@@ -101,10 +113,9 @@ int main(int argc,char** argv)
   // Process macro or start UI session
   //
   if ( ! ui ) {
-    // barch mode
+    // batch mode
     G4String command = "/control/execute ";
-    G4String fileName = argv[1];
-    UImanager->ApplyCommand(command+fileName);
+    UImanager->ApplyCommand(command+macro);
   }
   else {  
     // interactive mode

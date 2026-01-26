@@ -1,0 +1,88 @@
+# Macro file for example B2
+# 
+# Can be run in batch, without graphic
+# or interactively: Idle> /control/execute run1.mac
+#
+# Change the default number of workers (in multi-threading mode) 
+#/run/numberOfThreads 4
+#
+/PHONON/det/setGDMLFile gdml/scintillator_shield/DetectorNoShield.gdml
+/PHONON/run/useHDF5 false
+#/PHONON/run/setOutputFile shielded_testfiletypesetting
+#/PHONON/run/setOutputFile shielded_testfiletypesetting_higherEprimary
+/PHONON/run/setOutputFile test_511gammas.root
+#/PHONON/run/setOutputFile scrap.root
+
+# Initialize kernel
+/run/initialize
+#
+# Default kinematics: 
+# proton 3 GeV in direction (0.,0.,1.)
+# 1 event with tracking/verbose
+#
+#/tracking/verbose 1
+#/run/beamOn 1
+#
+# 1 event with printing hits
+#
+/tracking/verbose 0
+/hits/verbose 2
+#/run/beamOn 1
+#
+# set target and chamber material
+#
+#/B2/det/setTargetMaterial G4_WATER
+#/B2/det/setChamberMaterial G4_Ar
+#/run/beamOn 3
+# 
+# set a magnetic field and max allowed step length
+# 3 event with printing hits
+#
+#/globalField/verbose 1
+#/globalField/setValue 0.2 0 0 tesla
+#/B2/det/stepMax 1.0 mm
+#/gun/energy 0.3 GeV
+#/run/beamOn 3
+#
+# muon 300 MeV in the direction (0.,0.,1.)
+# 3 event with detailed printing
+#
+
+/g4cmp/producePhonons 0
+/g4cmp/produceCharges 0
+/g4cmp/maxLukePhonons 0
+#/g4cmp/sampleLuke 0.00001
+/g4cmp/phononBounces 1
+/g4cmp/minEPhonons 0.001 eV
+#/g4cmp/verbose 1
+
+/process/inactivate phononScattering
+/process/inactivate phononDownconversion
+
+/PHONONEvent/offset 0
+
+/gps/particle gamma
+/gps/ene/type Mono
+/gps/energy 511 keV
+#/gps/energy 0.03 eV
+#/gps/particle phononL
+#/gps/pos/type Point
+#/gps/ang/type iso
+#/gps/number 1
+#/gps/ene/type Lin
+#/gps/ene/min 0.0 MeV
+#/gps/ene/max 200.0 MeV
+#/gps/ene/gradient 0.0
+#/gps/ene/intercept 0.001
+/gps/pos/type Plane
+/gps/pos/shape Square
+/gps/pos/centre -0.51 0.0 0.0 m
+/gps/pos/halfx 0.5 m
+/gps/pos/halfy 0.5 m
+/gps/pos/rot1 0 0 1
+/gps/pos/rot2 0 1 0
+/gps/ang/type cos
+#/gps/pos/confine NeutronPlaneVol
+
+/run/beamOn 7500
+#/run/beamOn 1000

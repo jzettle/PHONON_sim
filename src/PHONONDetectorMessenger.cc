@@ -51,10 +51,10 @@ PHONONDetectorMessenger::PHONONDetectorMessenger(PHONONDetectorConstruction* Det
   fGDMLFileCmd->SetParameterName("choice",false);
   fGDMLFileCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
-  fChamMatCmd = new G4UIcmdWithAString("/PHONON/det/setChamberMaterial",this);
-  fChamMatCmd->SetGuidance("Select Material of the Chamber.");
-  fChamMatCmd->SetParameterName("choice",false);
-  fChamMatCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+  fTypeCmd = new G4UIcmdWithAString("/PHONON/det/setType",this);
+  fTypeCmd->SetGuidance("Select whether loading the scintillator or substrate geometry.");
+  fTypeCmd->SetParameterName("type",false);
+  fTypeCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
 
   fStepMaxCmd = new G4UIcmdWithADoubleAndUnit("/PHONON/det/stepMax",this);
   fStepMaxCmd->SetGuidance("Define a step max");
@@ -68,8 +68,8 @@ PHONONDetectorMessenger::PHONONDetectorMessenger(PHONONDetectorConstruction* Det
 PHONONDetectorMessenger::~PHONONDetectorMessenger()
 {
   delete fGDMLFileCmd;
-  delete fChamMatCmd;
   delete fStepMaxCmd;
+  delete fTypeCmd;
   delete fB2Directory;
   delete fDetDirectory;
 }
@@ -81,9 +81,9 @@ void PHONONDetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue
   if( command == fGDMLFileCmd )
    { fDetectorConstruction->SetGDMLFile(newValue);}
 
-  if( command == fChamMatCmd )
-   { fDetectorConstruction->SetChamberMaterial(newValue);}
-
+  if( command == fTypeCmd )
+   { fDetectorConstruction->SetGeometryType(newValue);}
+   
   if( command == fStepMaxCmd ) {
     fDetectorConstruction
       ->SetMaxStep(fStepMaxCmd->GetNewDoubleValue(newValue));

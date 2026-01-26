@@ -59,10 +59,10 @@ class PHONONDetectorConstruction : public G4VUserDetectorConstruction
 
     // Set methods
     void SetGDMLFile(G4String filename);
-    void SetTargetMaterial (G4String );
-    void SetChamberMaterial(G4String );
+    void SetGeometryType(G4String type);
     void SetMaxStep (G4double );
     void SetCheckOverlaps(G4bool );
+    G4String GetGeometryType() const;
 
   private:
     // methods
@@ -74,7 +74,8 @@ class PHONONDetectorConstruction : public G4VUserDetectorConstruction
 
     G4String fGDMLFile = ""; // GDML file name for geometry definition
 
-    G4LogicalVolume*   fLogicTarget;     // pointer to the logical Target
+    G4String fGeometryType = "substrate"; // Geometry type to be loaded
+
     G4LogicalVolume*   fLogicChamber;    // pointer to the logical Chamber
     G4LogicalVolume*   fSensorLogic;     // pointer to the logical Sensor
 
@@ -82,10 +83,6 @@ class PHONONDetectorConstruction : public G4VUserDetectorConstruction
     G4VPhysicalVolume*  fAirPhys; // pointer to the air Chamber
     G4VPhysicalVolume*  fSensorPhys; // pointer to the sensor Chamber
 
-
-    G4Material*        fPbShieldMaterial;  // pointer to the lead shield material
-    G4Material*        fWaterShieldMaterial; // pointer to the water shield material
-    G4Material*        fVacuumMaterial; // pointer to the vacuum material
     G4Material*        fChamberMaterial; // pointer to the chamber material
 
     G4UserLimits*      fStepLimit;       // pointer to user step limits

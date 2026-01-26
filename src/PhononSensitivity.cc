@@ -59,8 +59,8 @@ void PhononSensitivity::EndOfEvent(G4HCofThisEvent* HCE) {
   auto* hitCol = static_cast<G4CMPElectrodeHitsCollection*>(HCE->GetHC(HCID));
   std::vector<G4CMPElectrodeHit*>* hitVec = hitCol->GetVector();
   G4cout << "Got " << hitVec->size() << " phonon-based hits." << G4endl;
-  G4RunManager* runMan = G4RunManager::GetRunManager();
-
+  //G4RunManager* runMan = G4RunManager::GetRunManager();
+  /*
   if (output.good()) {
     for (G4CMPElectrodeHit* hit : *hitVec) {
       output << runMan->GetCurrentRun()->GetRunID() << ','
@@ -80,6 +80,7 @@ void PhononSensitivity::EndOfEvent(G4HCofThisEvent* HCE) {
              << hit->GetFinalTime()/ns << '\n';
     }
   }
+  */
 }
 
 void PhononSensitivity::SetOutputFile(const G4String &fn) {
@@ -114,16 +115,20 @@ G4bool PhononSensitivity::IsHit(const G4Step* step,
   const G4TouchableHandle touch1 = postStepPoint->GetTouchableHandle();
   const G4VPhysicalVolume* volume = touch1->GetVolume();
   const G4String name = volume->GetName();
+  //for now try to only track hits that occur from the primary particle
   //G4cout << name << G4endl;
+
+  int parentID = track->GetParentID();
 
   G4bool correctParticle = particle == G4PhononLong::Definition() ||
                            particle == G4PhononTransFast::Definition() ||
                            particle == G4PhononTransSlow::Definition();
   //if(correctParticle) G4cout << "PhononSensitivity::IsHit: got phonon particle." << G4endl;
 
-  G4bool correctStatus = step->GetTrack()->GetTrackStatus() == fStopAndKill &&
-                         postStepPoint->GetStepStatus() == fGeomBoundary &&
-                         step->GetNonIonizingEnergyDeposit() > 0. && name=="ScintillatorVol";
+  //G4bool correctStatus = step->GetTrack()->GetTrackStatus() == fStopAndKill &&
+  //                       postStepPoint->GetStepStatus() == fGeomBoundary &&
+  //                       step->GetNonIonizingEnergyDeposit() > 0. && name=="ScintillatorVol" && parentID==1;
+  G4bool correctStatus = name=="ScintillatorVol" && parentID==1;
   //if(correctStatus) G4cout << "PhononSensitivity::IsHit: got correct status." << G4endl;
 
   //if(correctParticle && correctStatus)

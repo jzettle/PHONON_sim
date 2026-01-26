@@ -24,15 +24,18 @@
 // ********************************************************************
 //
 //
-/// \file B2EventAction.cc
-/// \brief Implementation of the B2EventAction class
+/// \file PHONONEventAction.cc
+/// \brief Implementation of the PHONONEventAction class
 
 #include "PHONONEventAction.hh"
+#include "PHONONEventMessenger.hh"
 #include "PHONONScintSD.hh"
 #include "PHONONRunAction.hh"
 
 #include "G4Event.hh"
 #include "G4EventManager.hh"
+#include "G4CMPElectrodeHit.hh"
+#include "G4SystemOfUnits.hh"
 #include "G4TrajectoryContainer.hh"
 #include "G4Trajectory.hh"
 #include "G4PrimaryParticle.hh"
@@ -47,17 +50,32 @@
 
 PHONONEventAction::PHONONEventAction()
 : G4UserEventAction()
-{}
+{ fMessenger = new PHONONEventMessenger(this); }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 PHONONEventAction::~PHONONEventAction()
-{}
+{ delete fMessenger; }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void PHONONEventAction::BeginOfEventAction(const G4Event*)
-{}
+void PHONONEventAction::SetEventOffset(G4int offset)
+{
+  fOffset = offset; 
+  G4cout << "Event offset set to " << fOffset << G4endl;
+}
+
+int PHONONEventAction::GetEventOffset() const
+{
+  return fOffset;
+}
+
+void PHONONEventAction::BeginOfEventAction(const G4Event* event)
+{
+  G4RunManager* runMan = G4RunManager::GetRunManager();
+  int totalEvents = runMan->GetNumberOfEventsToBeProcessed();
+  fEventOffset = totalEvents*fOffset; //avoids duplicating last event as event numbers are 0-N-1
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -78,25 +96,16 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
   //set file type to HDF5 if required
   //analysisManager->SetDefaultFileType("root");
   //G4cout << "Using HDF5 output format." << G4endl;
-
+  
   G4TrajectoryContainer* trajectoryContainer = event->GetTrajectoryContainer();
   G4int n_trajectories = 0;
   if (trajectoryContainer) n_trajectories = trajectoryContainer->entries();
-  double primary_x = std::numeric_limits<double>::quiet_NaN(), primary_y = std::numeric_limits<double>::quiet_NaN(), primary_z = std::numeric_limits<double>::quiet_NaN();
-  //grab position of primary from trajectory container
-  if (n_trajectories > 0) {
-    G4Trajectory* primaryTraj = (G4Trajectory*)(*trajectoryContainer)[0];
-    if (primaryTraj) {
-      G4ThreeVector primaryPos = primaryTraj->GetPoint(0)->GetPosition();
-      primary_x = primaryPos.x();
-      primary_y = primaryPos.y();
-      primary_z = primaryPos.z();
-    }
-  }
-
+  
   //extract primary particle information (this is nicer than going through the trajectory container)
   // Note: This assumes there is at least one primary vertex and one primary particle.
+  double primary_x = std::numeric_limits<double>::quiet_NaN(), primary_y = std::numeric_limits<double>::quiet_NaN(), primary_z = std::numeric_limits<double>::quiet_NaN();
   G4PrimaryParticle* primaryParticle = event->GetPrimaryVertex()->GetPrimary(0);
+  G4PrimaryVertex* primaryVertex = event->GetPrimaryVertex(0);
 
   // periodic printing
   if ( eventID < 100 || eventID % 100 == 0) {
@@ -129,23 +138,38 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
 
   G4double totalNR = 0.0;
   G4double totalER = 0.0;
+  G4double totalNb = 0.0;
+  G4double totalLi = 0.0;
+  G4double totalO = 0.0;
+
+  //alter event number based on offset
+  eventID += fEventOffset;
 
   if (myHitsCollection) {
     for (unsigned int i = 0; i < myHitsCollection->entries(); ++i) {
       PHONONScintHit* hit = (*myHitsCollection)[i];
+      
       if (hit) {
-        // Output hit information to the file
-          fOutputFile << "Event ID: " << eventID
-                      << ", Track ID: " << hit->GetTrackID()
-                      << ", PDG Code: " << hit->GetPDGCode()
-                      << ", Particle Name: " << hit->GetParticleName()
-                      //<< ", Chamber Number: " << hit->GetChamberNb()
-                      << ", Energy Deposit: " << hit->GetEdep()
-                      << ", Position: " << hit->GetPos() << G4endl;    
         if( (hit->GetParticleName().find("Li") != std::string::npos) || (hit->GetParticleName().find("Nb") != std::string::npos) || (hit->GetParticleName().find("O") != std::string::npos) ) 
         {
           totalNR += hit->GetEdep();
         }         
+        if(hit->GetParticleName().find("Li") != std::string::npos) 
+        {
+          totalLi += hit->GetEdep();
+        }
+        if(hit->GetParticleName().find("Nb") != std::string::npos) 
+        {
+          totalNb += hit->GetEdep();
+        }
+        if(hit->GetParticleName().find("O") != std::string::npos) 
+        {
+          totalO += hit->GetEdep();
+        }
+        if (hit->GetParticleName() == "gamma" || hit->GetParticleName() == "e-" || hit->GetParticleName() == "e+") 
+        {
+          totalER += hit->GetEdep();
+        }
         // Fill the analysis ntuple
           analysisManager->FillNtupleDColumn(1, 0, eventID);
           analysisManager->FillNtupleDColumn(1, 1, hit->GetTrackID());
@@ -163,17 +187,78 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
           analysisManager->FillNtupleDColumn(1, 13, hit->GetMomentumDirection().y());
           analysisManager->FillNtupleDColumn(1, 14, hit->GetMomentumDirection().z());
           analysisManager->FillNtupleDColumn(1, 15, hit->GetTime());
+          analysisManager->FillNtupleDColumn(1, 16, hit->GetCopyNumber());
           analysisManager->AddNtupleRow(1);
         }
     }
   }
   
+  //add phonon hit information to the output trees
+  collectionID = sdManager->GetCollectionID("PhononElectrode/G4CMPElectrodeHit");
+  if (collectionID < 0) {
+    G4cerr << "Phonon Hits collection not found, proceeding!" << G4endl;
+    return;
+  }
+
+  G4CMPElectrodeHitsCollection* phononHC = 0;
+  if (HCofEvent) {
+      phononHC = static_cast<G4CMPElectrodeHitsCollection*>(HCofEvent->GetHC(collectionID));
+  } 
+  if (phononHC) {
+    //totalPhonons = phononHC->entries();
+    for (unsigned int i = 0; i < phononHC->entries(); ++i) {
+      G4CMPElectrodeHit* hit = (*phononHC)[i];
+      if (hit) {
+          analysisManager->FillNtupleDColumn(3, 0, eventID);
+          analysisManager->FillNtupleDColumn(3, 1, hit->GetTrackID());
+          analysisManager->FillNtupleSColumn(3, 2, hit->GetParticleName());
+          analysisManager->FillNtupleDColumn(3, 3, hit->GetStartEnergy());
+          analysisManager->FillNtupleDColumn(3, 4, hit->GetStartPosition().x());
+          analysisManager->FillNtupleDColumn(3, 5, hit->GetStartPosition().y());
+          analysisManager->FillNtupleDColumn(3, 6, hit->GetStartPosition().z());
+          analysisManager->FillNtupleDColumn(3, 7, hit->GetStartTime());
+          analysisManager->FillNtupleDColumn(3, 8, hit->GetEnergyDeposit()/eV);
+          analysisManager->FillNtupleDColumn(3, 9, hit->GetWeight());
+          analysisManager->FillNtupleDColumn(3, 10, hit->GetFinalPosition().x());
+          analysisManager->FillNtupleDColumn(3, 11, hit->GetFinalPosition().y());
+          analysisManager->FillNtupleDColumn(3, 12, hit->GetFinalPosition().z());
+          analysisManager->FillNtupleDColumn(3, 13, hit->GetFinalTime());
+          analysisManager->AddNtupleRow(3);
+      }
+    }
+  }
+
+  //count number of phonons created in the event
+  int totalPhonons = 0;
+  G4TrajectoryContainer* trajContainer = event->GetTrajectoryContainer();
+  if (trajContainer) {
+    int nTraj = trajContainer->entries();
+    for (int i=0; i<nTraj; ++i) {
+      G4Trajectory* traj = (G4Trajectory*) ((*trajContainer)[i]);
+      int parentID = traj->GetParentID();
+      if (traj) {
+        if ((traj->GetParticleName() == "phononL" || traj->GetParticleName() == "phononTS" || traj->GetParticleName() == "phononTF") && parentID == 1) {
+          ++totalPhonons;
+        }
+        if ((traj->GetParticleName() == "phononL" || traj->GetParticleName() == "phononTS" || traj->GetParticleName() == "phononTF") && parentID != 1) {
+          ++totalPhonons;
+        }
+      }
+    }
+  }
+
   if (primaryParticle) {
     G4int trackID = primaryParticle->GetTrackID();
     G4int pdgCode = primaryParticle->GetPDGcode();
     G4double kineticEnergy = primaryParticle->GetKineticEnergy();
     //G4ThreeVector position = primaryParticle->GetPosition();
     G4ThreeVector momentumDirection = primaryParticle->GetMomentumDirection();
+    if (primaryVertex) {
+      G4ThreeVector primaryPos = primaryVertex->GetPosition();
+      primary_x = primaryPos.x();
+      primary_y = primaryPos.y();
+      primary_z = primaryPos.z();
+    }
     analysisManager->FillNtupleDColumn(0, 0, eventID);
     analysisManager->FillNtupleDColumn(0, 1, trackID);
     analysisManager->FillNtupleDColumn(0, 2, pdgCode);
@@ -184,10 +269,16 @@ void PHONONEventAction::EndOfEventAction(const G4Event* event)
     analysisManager->FillNtupleDColumn(0, 7, momentumDirection.x());
     analysisManager->FillNtupleDColumn(0, 8, momentumDirection.y());
     analysisManager->FillNtupleDColumn(0, 9, momentumDirection.z());
-    analysisManager->FillNtupleDColumn(0, 10, totalNR);
-    analysisManager->FillNtupleDColumn(0, 11, totalER);
+    analysisManager->FillNtupleDColumn(0, 10, totalNb);
+    analysisManager->FillNtupleDColumn(0, 11, totalLi);
+    analysisManager->FillNtupleDColumn(0, 12, totalO);
+    analysisManager->FillNtupleDColumn(0, 13, totalNR);
+    analysisManager->FillNtupleDColumn(0, 14, totalER);
+    analysisManager->FillNtupleDColumn(0, 15, totalPhonons);
     analysisManager->AddNtupleRow(0);
   }
+
+
   fOutputFile.close(); 
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

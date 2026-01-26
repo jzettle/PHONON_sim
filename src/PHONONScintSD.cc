@@ -36,6 +36,8 @@
 #include "G4ios.hh"
 #include "G4SystemOfUnits.hh"
 
+#include <regex>
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 PHONONScintSD::PHONONScintSD(const G4String& name,
@@ -72,6 +74,22 @@ void PHONONScintSD::Initialize(G4HCofThisEvent* hce)
 G4bool PHONONScintSD::ProcessHits(G4Step* aStep, 
                                      G4TouchableHistory*)
 {  
+
+  //get the wafer number of the hit volume
+  //G4int copyNumber = aStep->GetPreStepPoint()->GetTouchable()->GetCopyNumber();
+  G4String volumeName = aStep->GetPreStepPoint()->GetTouchable()->GetVolume()->GetName();
+  G4int copyNumber = -1;
+  std::regex rgx(R"(\d)");
+  std::smatch match;
+  if(std::regex_search(volumeName, match, rgx))
+  {
+    // Convert the matched string to an integer
+    copyNumber = std::stoi(match.str(0));
+  }
+  else
+  {
+    copyNumber = -1; // or handle the error as appropriate
+  }
   // energy deposit
   G4double edep = aStep->GetTotalEnergyDeposit()/MeV;
 
@@ -97,6 +115,7 @@ G4bool PHONONScintSD::ProcessHits(G4Step* aStep,
   newHit->SetMomentum(aStep->GetPostStepPoint()->GetMomentum()/MeV);
   newHit->SetMomentumDirection(aStep->GetPostStepPoint()->GetMomentumDirection());
   newHit->SetTime(aStep->GetPostStepPoint()->GetGlobalTime()/ns); //use the global time for now, think about this more if it matters (i.e. decays)
+  newHit->SetCopyNumber(copyNumber);
   //test
   fHitsCollection->insert( newHit );
 
